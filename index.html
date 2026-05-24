@@ -5,141 +5,372 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DkDarsh | Developer Portfolio</title>
     <style>
-      :root{
-        --bg1:#0b1220;
-        --bg2:#0f2a43;
-        --card: rgba(255,255,255,.08);
-        --card2: rgba(255,255,255,.06);
-        --text:#eaf2ff;
-        --muted: rgba(234,242,255,.78);
-        --accent:#4cc9f0;
-        --accent2:#90f5c6;
-        --border: rgba(255,255,255,.14);
-        --shadow: 0 10px 30px rgba(0,0,0,.25);
+      :root {
+        color-scheme: dark;
+
+        --bg1: #090f1c;
+        --bg2: #0e1e38;
+        --card: rgba(255, 255, 255, 0.03);
+        --card-hover: rgba(255, 255, 255, 0.07);
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --accent-glow: rgba(56, 189, 248, 0.15);
+        --accent2: #34d399;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-hover: rgba(56, 189, 248, 0.3);
+        --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      *{ box-sizing:border-box; }
-      html, body{ height:100%; }
-      body{
-        margin:0;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+      * { 
+        box-sizing: border-box; 
+        margin: 0;
+        padding: 0;
+      }
+
+      html, body { 
+        height: 100%; 
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         color: var(--text);
-        line-height: 1.65;
-        background:
-          radial-gradient(1200px 600px at 20% 0%, rgba(76,201,240,.22), transparent 55%),
-          radial-gradient(900px 500px at 80% 20%, rgba(144,245,198,.16), transparent 60%),
-          linear-gradient(135deg, var(--bg1), var(--bg2));
+        line-height: 1.6;
+        background-color: var(--bg1);
+        background-image:
+          radial-gradient(1000px 500px at 10% 0%, rgba(56, 189, 248, 0.15), transparent 50%),
+          radial-gradient(800px 400px at 90% 20%, rgba(52, 211, 153, 0.1), transparent 50%),
+          linear-gradient(160deg, var(--bg1), var(--bg2));
+        background-attachment: fixed;
+        padding: 24px 16px;
       }
-      a{ color: var(--accent); text-decoration:none; }
-      a:hover{ text-decoration:underline; }
-      .container{ max-width:1100px; margin:0 auto; padding:24px 16px 56px; }
-      header{
-        margin: 0 auto 24px;
-        border:1px solid var(--border);
-        background: linear-gradient(90deg, rgba(76,201,240,.18), rgba(144,245,198,.14));
-        border-radius: 14px;
-        padding: 24px 20px;
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
       }
-      header h1{ margin: 0; font-size: 1.8rem; color: white; letter-spacing: .2px; font-weight: 700; }
-      header p{ margin: 12px 0 0; color: var(--muted); max-width: 70ch; font-size: 1.05rem; }
-      section{ margin-top: 28px; }
-      section h2{ margin: 0 0 16px; font-size: 1.4rem; color: var(--accent2); font-weight: 600; }
-      section > p { margin: 0 0 16px; color: var(--muted); }
-      main{
-        background: var(--card2);
+      ::-webkit-scrollbar-track {
+        background: var(--bg1);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .container { 
+        max-width: 1100px; 
+        margin: 0 auto; 
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      header {
         border: 1px solid var(--border);
-        border-radius: 18px;
-        box-shadow: var(--shadow);
-        padding: 24px 20px 32px;
-        max-width: 1100px;
-        margin: 0 auto;
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(52, 211, 153, 0.04));
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 20px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
       }
-      #projects{
-        display: grid;
-        grid-template-columns: 1fr;
+
+      header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+      }
+
+      .header-meta {
+        display: flex;
+        flex-direction: column;
         gap: 16px;
-        margin-top: 16px;
       }
-      .project-card{
-        background: rgba(255,255,255,.05);
-        border: 1px solid rgba(255,255,255,.10);
-        border-radius: 12px;
+
+      header h1 { 
+        font-size: 2rem; 
+        color: #ffffff; 
+        font-weight: 800;
+        letter-spacing: -0.5px; 
+        line-height: 1.2;
+      }
+
+      header p { 
+        color: var(--muted); 
+        max-width: 65ch; 
+        font-size: 1.05rem;
+      }
+
+      /* Social Links Badge */
+      .social-links {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+
+      .social-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+      }
+
+      .social-btn:hover {
+        background: var(--accent-glow);
+        border-color: var(--accent);
+        text-decoration: none;
+        transform: translateY(-1px);
+        color: var(--accent);
+      }
+
+      main {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+      }
+
+      section h2 { 
+        margin-bottom: 12px; 
+        font-size: 1.4rem; 
+        font-weight: 700;
+        color: #ffffff; 
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      section h2::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 18px;
+        background: linear-gradient(to bottom, var(--accent), var(--accent2));
+        border-radius: 4px;
+      }
+
+      #about p {
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.7;
+      }
+
+      /* Target timeline block highlight */
+      .highlight-badge {
+        display: inline-block;
+        background: rgba(52, 211, 153, 0.1);
+        color: var(--accent2);
+        padding: 2px 10px;
+        font-size: 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        margin-bottom: 14px;
+        border: 1px solid rgba(52, 211, 153, 0.2);
+      }
+
+      .section-intro {
+        color: var(--muted);
+        margin-bottom: 20px;
+        font-size: 1rem;
+      }
+
+      /* Align projects in a clean vertical column */
+      .projects-column {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .project-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
         padding: 20px;
-        transition: all .2s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: var(--transition);
+        position: relative;
       }
-      .project-card:hover{
+
+      .project-card:hover {
         transform: translateY(-4px);
-        border-color: rgba(76,201,240,.35);
-        background: rgba(255,255,255,.09);
-        box-shadow: 0 8px 24px rgba(76,201,240,.12);
+        border-color: var(--border-hover);
+        background: var(--card-hover);
+        box-shadow: 0 12px 24px -10px rgba(56, 189, 248, 0.15);
       }
-      .project-card h3{ margin: 0 0 10px; font-size: 1.15rem; color: var(--accent); font-weight: 600; }
-      .project-card p{ margin: 0 0 14px; color: var(--muted); font-size: 0.95rem; }
-      .project-card a{ 
+
+      .project-card-content h3 { 
+        margin-bottom: 10px; 
+        font-size: 1.15rem; 
+        font-weight: 700;
+        color: var(--accent); 
+        line-height: 1.4;
+      }
+
+      .project-card-content p { 
+        margin-bottom: 20px; 
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .project-card a { 
         display: inline-flex; 
         align-items: center; 
-        gap: 8px; 
+        gap: 6px; 
         font-weight: 600; 
-        color: var(--accent2);
-        transition: gap .2s ease;
-      }
-      .project-card a:hover{ gap: 12px; }
-      footer{ margin-top: 28px; padding: 16px 0 0; color: rgba(234,242,255,.6); text-align: center; border-top: 1px solid var(--border); font-size: 0.9rem; }
-
-      /* Tablet and Desktop Styles */
-      @media (min-width: 768px){
-        body{ padding: 0; }
-        header{ padding: 28px 24px; }
-        header h1{ font-size: 2.2rem; }
-        main{ padding: 28px 32px 40px; }
-        #projects{ grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
-        .project-card{ padding: 24px; }
+        color: var(--accent2); 
+        font-size: 0.95rem;
+        transition: var(--transition);
+        width: fit-content;
       }
 
+      .project-card a:hover { 
+        color: #ffffff;
+        text-decoration: none; 
+      }
+
+      .project-card a span {
+        transition: transform 0.2s ease;
+      }
+
+      .project-card a:hover span {
+        transform: translateX(4px);
+      }
+
+      footer { 
+        margin-top: 10px; 
+        padding: 16px 0; 
+        color: rgba(148, 163, 184, 0.6); 
+        text-align: center; 
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border);
+      }
+
+      /* Responsive layout triggers */
+      @media (min-width: 1024px) {
+        body {
+          padding: 40px 24px;
+        }
+        header {
+          padding: 36px;
+        }
+        header h1 {
+          font-size: 2.6rem;
+        }
+        /* Keep main container in a grid to align About side-by-side with Projects */
+        main {
+          padding: 40px;
+          display: grid;
+          grid-template-columns: 300px 1fr;
+          gap: 48px;
+          align-items: start;
+        }
+        /* Sticky positioning keeps the brief intro pinned on scroll */
+        #about {
+          position: sticky;
+          top: 40px;
+        }
+      }
     </style>
-    </head>
+</head>
 <body>
 
-    <header>
-        <h1>Hello, I'm DkDarsh</h1>
-        <p>Welcome to my coding journey. I am a pre-college student learning full-stack development.</p>
-    </header>
+    <div class="container">
+        <header>
+            <div class="header-meta">
+                <div>
+                    <h1>Hello, I'm DkDarsh</h1>
+                    <p>Welcome to my coding journey. I am a pre-college student learning full-stack development.</p>
+                </div>
+                <div class="social-links">
+                    <a href="https://github.com" target="_blank" class="social-btn">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                        GitHub
+                    </a>
+                    <a href="mailto:darsh.keshri123@gmail.com" target="_blank" rel="noopener noreferrer" class="social-btn">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741zM1 11.105l4.708-2.897L1 5.383z"/></svg>
+                        darsh.keshri123@gmail.com
+                    </a>
+                    <a href="mailto:darshkeshri1@outlook.com" target="_blank" rel="noopener noreferrer" class="social-btn">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741zM1 11.105l4.708-2.897L1 5.383z"/></svg>
+                        darshkeshri1@outlook.com
+                    </a>
+                </div>
+            </div>
+        </header>
 
-    <main>
-        
-        <section id="about">
-            <h2>About Me</h2>
-            <p>I started learning web development on May 21st, starting from basic HTML. I'm currently working through freeCodeCamp's Responsive Web Design Certification to build a strong foundation b[...]
-        </section>
+        <main>
+            
+            <section id="about">
+                <h2>About Me</h2>
+                <div class="highlight-badge">Began Coding: May 21st</div>
+                <p>I started learning web development on May 21st, starting from basic HTML. I'm currently working through freeCodeCamp's Responsive Web Design Certification to build a strong foundation before starting college.</p>
+            </section>
 
-        <section id="projects">
-            <h2>My Projects</h2>
-            <p>Click on any project below to view the live webpage:</p>
+            <section id="projects">
+                <h2>My Projects</h2>
+                <p class="section-intro">Click on any project below to view the live webpage:</p>
 
-            <article class="project-card">
-                <h3>Architecture of Engineering in India</h3>
-                <p>A comprehensive guide mapping out JEE Mains, Advanced, top tier colleges (IITs/NITs), and the quota systems.</p>
-                <a href="engineering-in-india.html" target="_blank">View Project &rarr;</a>
-            </article>
+                <div class="projects-column">
+                    <article class="project-card">
+                        <div class="project-card-content">
+                            <h3>Architecture of Engineering in India</h3>
+                            <p>A comprehensive guide mapping out JEE Mains, Advanced, top tier colleges (IITs/NITs), and the quota systems.</p>
+                        </div>
+                        <a href="engineering-in-india.html" target="_blank">View Project <span>&rarr;</span></a>
+                    </article>
 
-            <article class="project-card">
-                <h3>Text Encryptor Practice</h3>
-                <p>A standalone page practicing data manipulation concepts.</p>
-                <a href="encryptor.html" target="_blank">View Project &rarr;</a>
-            </article>
+                    <article class="project-card">
+                        <div class="project-card-content">
+                            <h3>Text Encryptor Practice</h3>
+                            <p>A standalone page practicing data manipulation concepts.</p>
+                        </div>
+                        <a href="encryptor.html" target="_blank">View Project <span>&rarr;</span></a>
+                    </article>
 
-            <article class="project-card">
-                <h3>Operations Practice</h3>
-                <p>A basic structural playground for coding layout operations.</p>
-                <a href="operation-practice.html" target="_blank">View Project &rarr;</a>
-            </article>
+                    <article class="project-card">
+                        <div class="project-card-content">
+                            <h3>Operations Practice</h3>
+                            <p>A basic structural playground for coding layout operations.</p>
+                        </div>
+                        <a href="operation-practice.html" target="_blank">View Project <span>&rarr;</span></a>
+                    </article>
+                </div>
 
-        </section>
+            </section>
 
-    </main>
+        </main>
 
-    <footer>
-        <p>&copy; 2026 DkDarsh. Built with Semantic HTML.</p>
-    </footer>
+        <footer>
+            <p>&copy; 2026 DkDarsh. Built with Semantic HTML & Premium CSS.</p>
+        </footer>
+    </div>
 
 </body>
 </html>
