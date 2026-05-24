@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Engineering In India</title>
+        <style>
+          :root{
+            --bg1:#0b1220;
+            --bg2:#0f2a43;
+            --card: rgba(255,255,255,.08);
+            --card2: rgba(255,255,255,.06);
+            --text:#eaf2ff;
+            --muted: rgba(234,242,255,.78);
+            --accent:#4cc9f0;
+            --accent2:#90f5c6;
+            --border: rgba(255,255,255,.14);
+          }
+          *{ box-sizing:border-box; }
+          body{
+            margin:0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: var(--text);
+            background: radial-gradient(1200px 600px at 20% 0%, rgba(76,201,240,.22), transparent 55%),
+                        radial-gradient(900px 500px at 80% 20%, rgba(144,245,198,.16), transparent 60%),
+                        linear-gradient(135deg, var(--bg1), var(--bg2));
+            line-height: 1.65;
+          }
+          .page{
+            min-height:100vh;
+            padding: 24px 14px 56px;
+          }
+          .banner{
+            display:block;
+            width:100%;
+            padding: 10px 14px;
+            border:1px solid var(--border);
+            background: linear-gradient(90deg, rgba(76,201,240,.18), rgba(144,245,198,.14));
+            border-radius: 14px;
+            margin: 0 auto 18px;
+            max-width: 1100px;
+          }
+          .banner span{ color: var(--text); font-weight: 600; letter-spacing:.2px; }
+          main.content{
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+            padding: 18px 18px 28px;
+          }
+          section{
+            padding: 6px 2px 18px;
+            border-bottom: 1px solid rgba(255,255,255,.12);
+            margin-bottom: 18px;
+          }
+          h1, h2, h3{ margin: 18px 0 10px; line-height: 1.25; }
+          h1{ font-size: 1.6rem; color: white; }
+          h2{ font-size: 1.2rem; color: var(--accent2); }
+          h3{ font-size: 1.05rem; color: var(--accent); }
+          p{ margin: 8px 0; color: var(--muted); }
+          dl{
+            margin: 10px 0 0;
+          }
+          dt{
+            font-weight: 800;
+            color: white;
+          }
+          dd{ margin: 6px 0 14px; padding-left: 14px; border-left: 3px solid rgba(76,201,240,.35); }
+          ol{ margin: 10px 0 0; padding-left: 18px; }
+          ol > li{ margin: 10px 0; padding: 10px 12px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); border-radius: 12px; }
+          @media (min-width: 900px){
+            main.content{ padding: 22px 26px 34px; }
+            h1{ font-size: 2.0rem; }
+            h2{ font-size: 1.35rem; }
+          }
+          
+          .marquee{
+            overflow:hidden;
+            position:relative;
+            white-space:nowrap;
+          }
+          .marquee__track{
+            display:inline-flex;
+            gap: 48px;
+            align-items:center;
+            will-change: transform;
+            animation: marquee-scroll 14s linear infinite;
+          }
+          .marquee span{
+            display:inline-block;
+            font-weight:600;
+            letter-spacing:.2px;
+          }
+          @keyframes marquee-scroll{
+            0%{ transform: translateX(0); }
+            100%{ transform: translateX(-50%); }
+          }
+          @media (prefers-reduced-motion: reduce){
+            .marquee__track{ animation: none; }
+          }
+        </style>
+    </head>
+  <body>
+    <div class="page">
+      <div class="banner marquee" aria-label="Engineering overview ticker">
+        <div class="marquee__track">
+          <span>Engineering is one of the most prominent career options in the world. With the rise in AI and Machine Learning, more and more students tend to follow engineering as a career.</span>
+          <span aria-hidden="true">Engineering is one of the most prominent career options in the world. With the rise in AI and Machine Learning, more and more students tend to follow engineering as a career.</span>
+        </div>
+      </div>
+      <main class="content">
+<section>
+    <H1> Examinations For Engineering</H1>
+        <h2>Government Exams:</h2>
+       <dl>
+
+        <dt> <b>JEE MAINS</b></dt>
+        <dd> It is a national exam conducted by NTA
+            <p>It is taken by almost 15 to 16 lakh students across 10 days in January and April. Number of students is increasing every year due to which competition increases massively.</p>
+            <p>Almost 2.5 lakhs students qualify this exam and are allowed to write JEE ADVANCE paper which allows students to get admission in IIT and other reputed institution </p>
+        </dd>
+
+
+        <dt> <b>JEE ADVANCE</b></dt>
+       <dd>It is also a national exam for the students who qualify JEE MAINS and is conducted by JAB
+        <p>It is the qualifier exam for IIT and other national colleges like IIST, RGIPT  and IIPE.</p>
+        <p>Around 29,000 students qualify this exam out of which only 17,900 get seats in IIT</p>
+       </dd>
+
+
+        </dl>
+
+       <h2>Private Exams:</h2>
+       <dl>
+        
+        <dt><b>BITSAT</b></dt>
+        <dd> It is private exam conducted by BITS Pilani 
+            <p>It is one of the most reputed exam after JEE MAINS and JEE ADVANCE.</p>
+            <p>It allows admission to BITS colleges around India. Special exam is conducted for admission in Dubai campus</p>
+        </dd>
+
+
+        <dt><b>VITEEE</b></dt>
+        <dd> It is a private exam conducted by VIT VEllore.
+            <p>It is also a very famous college and ranks high in India</p>
+
+
+        </dd>
+
+        <dt><B>Comedk</B></dt>
+        <dd>It is a private exam conducted by the unified body of all the colleges in Karnataka.
+            <p>It allows admission to all engineering and medical colleges in the state.</p>
+        </dd>
+
+        </dl>
+
+</section>
+
+
+        <h1> Engineering Colleges in India</h1>
+<p> There are countless engineering colleges in India.</p>
+<h2>Government Colleges Using JEE MAINS</h2>
+<p>National colleges and state government colleges offer admission using JEE MAINS rank to students. These colleges offer HOME STATE QUOTA.</p>
+<p>These colleges are alloted using JOSAA(Joint Seat Allocation Authority)</p>
+
+<dl>
+    <dt><b>NIT: National Institue of Technology</b></dt>
+    <dd>There are 31  NITs in India.
+        <p>These colleges offer HOME STATE quota to the students of the state the college is located in. The seat quantity in HS quota is managed by the state government.</p>
+    </dd>
+
+
+    <dt><b>IIIT: Indian Institue of Information Technology</b></dt>
+    <dd>There are 26 IIITs in India.
+        <p>These colleges too offer HS quota.</p>
+    </dd>
+
+    <dt><b>GFTI</b></dt>
+    <dd>There are around 47 GFTIs in India.
+        <p>These Colleges are funded by the government and offer HS quota.</p>
+    </dd>
+</dl>
+
+<h2>Government Colleges Using JEE ADVANCE</h2>
+<p>IITs, RGIPT, IIST, IIPE offer admission using JEE ADVANCE ranks</p>
+<p>These colleges are alloted using JOSAA(Joint Seat Allocation Authority)</p>
+<dl>
+    <dt><b>IIT: Indian Institue of Technology</b></dt>
+    <dd>There are 23 IITs in India.
+        <p>These colleges are the considered the elite and top most colleges in India.</p>
+    </dd>
+
+
+    <dt><b>RGIPT: Rajiv Gandhi Institue of Petroleum Technology</b></dt>
+    <dd>There are 3 branches in India.
+        <p>These colleges are the premier institues for petroleum research and allied subjects.</p>
+    </dd>
+
+    <dt><b>IIST: Indian Institue of Space Technology</b></dt>
+    <dd>There is only 1 IIST situated in Trivandrum
+        <p>This college specializes in space research.</p>
+    </dd>
+
+    <dt><b>IIPE: Indian Institue of Petroleum Engineering</b></dt>
+    <dd>There is only 1 branch of this college situtated in Andhra Pradesh.
+        <p>This college too specializes in petroleum industry and its allied branches.</p>
+    </dd>
+</dl>
+
+<h2>Some Other Important Government Colleges</h2>
+<p>These too use JEE MAINS rankt o offer admission. These colleges are generally managed by the state government</p>
+<ol>
+    <p>These are some colleges in Delhi NCR band</p>
+    <li><b>DTU: Delhi Technical University</b>
+        <p>State government college with a lot of prestige and history. Seat allotment using JAC Delhi(Joint Admission Committee)</p>
+    </li>
+    <li><b>NSUT: Netaji Subhas University of Technology</b>
+        <p>State government college in Delhi. Seat alloted by JAC.</p>
+    </li>
+    <li><b>IGDTUW:Indira Gandhi Delhi Technical Universtiy for Women</b>
+        <p>Similar to DTU but for women. Seat through JAC.</p>
+    </li>
+    <li><b>GGSIPU: Guru Govind Singh Indraparstha University</b>
+        <p>It is a Delhi state government university. Many private colleges are also affiliated in it.</p>
+        <p>Seat allotment using the own GGSIPU Counselling.</p>
+    </li>
+</ol>
+
+ <h2>Private Colleges</h2>
+ <p>Almost all private colleges accept JEE MAINS rank for admission.</p>
+ <p>Some colleges also take their own exam like BITS, VIT, MIT, THAPAR etc.</p>
+
+<ol>
+    <li><b>BITSAT</b>
+        <p>BITSAT allows students to take admission Bits campuses in Pilani, Goa and Hyderabad.</p>
+    </li>
+    <li><b>VITEEE</b>
+    <p>VITEEE allows students to take admission in VIT campuses in Vellore, Chennai, Amaravati and Bhopal</p>
+</li>
+<li><b>Comedk</b>
+<p>Many private medical and engineering colleges in Karnataka use this paper for admission.</p></li>
+<li><b>THAPAR</b>
+<p>One of the private colleges with repetution.</p>
+</li>
+<li><b>MIT:Manipal Institue of Technology</b>
+<p>MIT also takes its own paper for admission.</p>
+</li>
+<li><b>Amity University</b>
+<p>Takes JEE MAINS rank, also its own paper for added scholarship.</p>
+</li>
+</ol>
+
+<p>These were some of the engineering colleges in India. Please visit their official sites for more info.</p>
+
+<h1> Quota Explained:-</h1>
+<h2>Category Quota</h2>
+<h3>General</h3>
+<p>No quota elegible except home state in state government colleges.</p>
+<h3>EWS</h3>
+<p>Students from economically marginalised background. Fee waivers and other benefits.</p>
+<h3>OBC NCL</h3>
+<p>Other backward classes non creamy layer, backward classes earning less than a specified income.</p>
+<h3>OBC CL</h3>
+<p>Other backward classes creamy layer, backward classes earning more than a specified income.</p>
+<h3>SC and ST</h3>
+<p>Schduled Castes and Tribes, ver backward classes as specified in the Indian Contitutuion.</p>
+<h3>Women</h3>
+<p>Specially reserved for women to empower and lead the society.</p>
+<h2>General Quota</h2>
+<h3>Home state</h3>
+<p>Quota elegible to all students other than their category quota. </p>
+</main>
+</body> 
+</html>
