@@ -4,12 +4,88 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DkDarsh | Developer Portfolio</title>
+    <style>
+      :root{
+        --bg1:#0b1220;
+        --bg2:#0f2a43;
+        --card: rgba(255,255,255,.08);
+        --card2: rgba(255,255,255,.06);
+        --text:#eaf2ff;
+        --muted: rgba(234,242,255,.78);
+        --accent:#4cc9f0;
+        --accent2:#90f5c6;
+        --border: rgba(255,255,255,.14);
+        --shadow: 0 10px 30px rgba(0,0,0,.25);
+      }
+      *{ box-sizing:border-box; }
+      html, body{ height:100%; }
+      body{
+        margin:0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: var(--text);
+        line-height: 1.65;
+        background:
+          radial-gradient(1200px 600px at 20% 0%, rgba(76,201,240,.22), transparent 55%),
+          radial-gradient(900px 500px at 80% 20%, rgba(144,245,198,.16), transparent 60%),
+          linear-gradient(135deg, var(--bg1), var(--bg2));
+      }
+      a{ color: var(--accent); text-decoration:none; }
+      a:hover{ text-decoration:underline; }
+      .container{ max-width:1100px; margin:0 auto; padding:24px 14px 56px; }
+      header{
+        margin: 0 auto 18px;
+        border:1px solid var(--border);
+        background: linear-gradient(90deg, rgba(76,201,240,.18), rgba(144,245,198,.14));
+        border-radius: 14px;
+        padding: 16px 14px;
+      }
+      header h1{ margin: 0; font-size: 1.7rem; color: white; letter-spacing: .2px; }
+      header p{ margin: 8px 0 0; color: var(--muted); max-width: 70ch; }
+      section{ margin-top: 22px; }
+      section h2{ margin: 0 0 12px; font-size: 1.25rem; color: var(--accent2); }
+      main{
+        background: var(--card2);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 18px 18px 28px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .project-card{
+        background: rgba(255,255,255,.05);
+        border: 1px solid rgba(255,255,255,.10);
+        border-radius: 16px;
+        padding: 14px 14px 16px;
+        transition: transform .18s ease, border-color .18s ease, background .18s ease;
+        margin-bottom: 14px;
+      }
+      .project-card:hover{
+        transform: translateY(-2px);
+        border-color: rgba(76,201,240,.35);
+        background: rgba(255,255,255,.07);
+      }
+      .project-card h3{ margin: 0 0 8px; font-size: 1.05rem; color: var(--accent); }
+      .project-card p{ margin: 0 0 12px; }
+      .project-card a{ display:inline-flex; align-items:center; gap:8px; font-weight:700; color: var(--accent2); }
+      footer{ margin-top: 18px; padding: 8px 0 0; color: rgba(234,242,255,.7); text-align: center; }
+      @media (min-width: 900px){
+        header h1{ font-size: 2.2rem; }
+        main{ padding: 22px 26px 34px; }
+        #projects{ display: grid; grid-template-columns: 1fr; gap: 14px; }
+        .project-card{ margin-bottom: 0; }
+      }
+
+      /* Layout helpers (used by this page) */
+      #projects{ margin-top: 12px; }
+
+    </style>
     </head>
 <body>
 
     <header>
-        <h1>Hello, I'm Darsh</h1>
-        <p>Welcome to my coding journey. I am a pre-college student learning full-stack development and coding.</p>
+        <h1>Hello, I'm DkDarsh</h1>
+        <p>Welcome to my coding journey. I am a pre-college student learning full-stack development.</p>
     </header>
 
     <main>
