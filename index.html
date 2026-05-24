@@ -31,53 +31,69 @@
       }
       a{ color: var(--accent); text-decoration:none; }
       a:hover{ text-decoration:underline; }
-      .container{ max-width:1100px; margin:0 auto; padding:24px 14px 56px; }
+      .container{ max-width:1100px; margin:0 auto; padding:24px 16px 56px; }
       header{
-        margin: 0 auto 18px;
+        margin: 0 auto 24px;
         border:1px solid var(--border);
         background: linear-gradient(90deg, rgba(76,201,240,.18), rgba(144,245,198,.14));
         border-radius: 14px;
-        padding: 16px 14px;
+        padding: 24px 20px;
       }
-      header h1{ margin: 0; font-size: 1.7rem; color: white; letter-spacing: .2px; }
-      header p{ margin: 8px 0 0; color: var(--muted); max-width: 70ch; }
-      section{ margin-top: 22px; }
-      section h2{ margin: 0 0 12px; font-size: 1.25rem; color: var(--accent2); }
+      header h1{ margin: 0; font-size: 1.8rem; color: white; letter-spacing: .2px; font-weight: 700; }
+      header p{ margin: 12px 0 0; color: var(--muted); max-width: 70ch; font-size: 1.05rem; }
+      section{ margin-top: 28px; }
+      section h2{ margin: 0 0 16px; font-size: 1.4rem; color: var(--accent2); font-weight: 600; }
+      section > p { margin: 0 0 16px; color: var(--muted); }
       main{
         background: var(--card2);
         border: 1px solid var(--border);
         border-radius: 18px;
         box-shadow: var(--shadow);
-        padding: 18px 18px 28px;
+        padding: 24px 20px 32px;
         max-width: 1100px;
         margin: 0 auto;
+      }
+      #projects{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-top: 16px;
       }
       .project-card{
         background: rgba(255,255,255,.05);
         border: 1px solid rgba(255,255,255,.10);
-        border-radius: 16px;
-        padding: 14px 14px 16px;
-        transition: transform .18s ease, border-color .18s ease, background .18s ease;
-        margin-bottom: 14px;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all .2s ease;
       }
       .project-card:hover{
-        transform: translateY(-2px);
+        transform: translateY(-4px);
         border-color: rgba(76,201,240,.35);
-        background: rgba(255,255,255,.07);
+        background: rgba(255,255,255,.09);
+        box-shadow: 0 8px 24px rgba(76,201,240,.12);
       }
-      .project-card h3{ margin: 0 0 8px; font-size: 1.05rem; color: var(--accent); }
-      .project-card p{ margin: 0 0 12px; }
-      .project-card a{ display:inline-flex; align-items:center; gap:8px; font-weight:700; color: var(--accent2); }
-      footer{ margin-top: 18px; padding: 8px 0 0; color: rgba(234,242,255,.7); text-align: center; }
-      @media (min-width: 900px){
-        header h1{ font-size: 2.2rem; }
-        main{ padding: 22px 26px 34px; }
-        #projects{ display: grid; grid-template-columns: 1fr; gap: 14px; }
-        .project-card{ margin-bottom: 0; }
+      .project-card h3{ margin: 0 0 10px; font-size: 1.15rem; color: var(--accent); font-weight: 600; }
+      .project-card p{ margin: 0 0 14px; color: var(--muted); font-size: 0.95rem; }
+      .project-card a{ 
+        display: inline-flex; 
+        align-items: center; 
+        gap: 8px; 
+        font-weight: 600; 
+        color: var(--accent2);
+        transition: gap .2s ease;
       }
+      .project-card a:hover{ gap: 12px; }
+      footer{ margin-top: 28px; padding: 16px 0 0; color: rgba(234,242,255,.6); text-align: center; border-top: 1px solid var(--border); font-size: 0.9rem; }
 
-      /* Layout helpers (used by this page) */
-      #projects{ margin-top: 12px; }
+      /* Tablet and Desktop Styles */
+      @media (min-width: 768px){
+        body{ padding: 0; }
+        header{ padding: 28px 24px; }
+        header h1{ font-size: 2.2rem; }
+        main{ padding: 28px 32px 40px; }
+        #projects{ grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+        .project-card{ padding: 24px; }
+      }
 
     </style>
     </head>
@@ -92,7 +108,7 @@
         
         <section id="about">
             <h2>About Me</h2>
-            <p>I started learning web development on May 21st, starting from basic HTML. I'm currently working through freeCodeCamp's Responsive Web Design Certification to build a strong foundation before starting college.</p>
+            <p>I started learning web development on May 21st, starting from basic HTML. I'm currently working through freeCodeCamp's Responsive Web Design Certification to build a strong foundation b[...]
         </section>
 
         <section id="projects">
