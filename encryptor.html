@@ -68,6 +68,28 @@
         .modal-blur {
             backdrop-filter: blur(8px) brightness(0.4);
         }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .back-btn:hover {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateX(-2px);
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -116,6 +138,13 @@
         </header>
 
         <section class="p-8 sm:p-10 space-y-8">
+            <!-- Back Button -->
+            <div class="flex mb-4">
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Portfolio
+                </a>
+            </div>
+
             <!-- Master Key -->
             <div class="space-y-3">
                 <div class="flex justify-between items-center px-1">
@@ -169,15 +198,15 @@
                         <i class="fas fa-fingerprint text-xs group-hover:scale-110 transition-transform"></i>
                         <span class="text-[9px] font-bold">AES</span>
                     </button>
-                    <button onclick="setProtocol('stego')" id="btn-stego" class="protocol-btn h-14 rounded-2xl border border-slate-800 text-slate-500 hover:border-slate-600 flex flex-col items-center justify-center gap-1">
+                    <button onclick="setProtocol('stego')" id="btn-stego" class="protocol-btn h-14 rounded-2xl border border-slate-800 text-slate-500 hover:border-slate-600 flex flex-col items-center justify-center gap-1 group">
                         <i class="fas fa-ghost text-xs"></i>
                         <span class="text-[9px] font-bold">STEGO</span>
                     </button>
-                    <button onclick="setProtocol('binary')" id="btn-binary" class="protocol-btn h-14 rounded-2xl border border-slate-800 text-slate-500 hover:border-slate-600 flex flex-col items-center justify-center gap-1">
+                    <button onclick="setProtocol('binary')" id="btn-binary" class="protocol-btn h-14 rounded-2xl border border-slate-800 text-slate-500 hover:border-slate-600 flex flex-col items-center justify-center gap-1 group">
                         <i class="fas fa-code text-xs"></i>
                         <span class="text-[9px] font-bold">BIN</span>
                     </button>
-                    <button onclick="setProtocol('morse')" id="btn-morse" class="protocol-btn h-14 rounded-2xl border border-slate-800 text-slate-500 hover:border-slate-600 flex flex-col items-center justify-center gap-1">
+                    <button onclick="setProtocol('morse')" id="btn-morse" class="protocol-btn h-14 rounded-2xl border border-slate-800 text-slate-500 hover:border-slate-600 flex flex-col items-center justify-center gap-1 group">
                         <i class="fas fa-wave-square text-xs"></i>
                         <span class="text-[9px] font-bold">MORSE</span>
                     </button>
@@ -193,11 +222,11 @@
                 </div>
 
                 <div class="flex gap-4">
-                    <button id="execute-btn" onclick="handleExecution()" class="flex-[3] accent-bg hover:brightness-110 text-white py-5 rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.25em] shadow-xl flex items-center justify-center gap-3 transition-all hover:-translate-y-1">
+                    <button id="execute-btn" onclick="handleExecution()" class="flex-[3] accent-bg hover:brightness-110 text-white py-5 rounded-[1.5rem] font-black uppercase text-[11px] tracking-[0.25em] transition-all flex items-center justify-center gap-2 group">
                         <i id="execute-icon" class="fas fa-shield-halved"></i> 
                         <span id="execute-text">Execute Encryption</span>
                     </button>
-                    <button onclick="clearAll()" class="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 py-5 rounded-[1.5rem] font-black border border-rose-500/20 transition-all flex items-center justify-center group" title="Purge Session">
+                    <button onclick="clearAll()" class="flex-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 py-5 rounded-[1.5rem] font-black border border-rose-500/20 transition-all flex items-center justify-center group">
                         <i class="fas fa-power-off group-hover:rotate-90 transition-transform"></i>
                     </button>
                 </div>
@@ -244,7 +273,7 @@
             <h3 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Transfer Key</h3>
             <div id="qrcode" class="bg-white p-4 rounded-3xl shadow-2xl inline-block ring-8 ring-slate-900"></div>
             <p class="text-[9px] text-slate-600 leading-relaxed uppercase">Scan to transfer the encrypted payload to another node.</p>
-            <button onclick="closeQR()" class="w-full py-4 bg-slate-900 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all border border-white/5">Close Portal</button>
+            <button onclick="closeQR()" class="w-full py-4 bg-slate-900 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all border border-white/5">Close Port</button>
         </div>
     </div>
 
@@ -277,7 +306,7 @@
             currentProtocol = p;
             document.querySelectorAll('.protocol-btn').forEach(btn => {
                 const isMatch = btn.id === `btn-${p}`;
-                btn.className = isMatch ? 'protocol-btn h-14 rounded-2xl border border-accent/40 bg-accent/10 text-accent flex flex-col items-center justify-center gap-1 group' : 'protocol-btn h-14 rounded-2xl border border-slate-800 text-slate-500 hover:border-slate-600 flex flex-col items-center justify-center gap-1';
+                btn.className = isMatch ? 'protocol-btn h-14 rounded-2xl border border-accent/40 bg-accent/10 text-accent flex flex-col items-center justify-center gap-1 group' : 'protocol-btn h-14 rounded-2xl border border-slate-800 text-slate-500 hover:border-slate-600 flex flex-col items-center justify-center gap-1 group';
             });
         }
 
