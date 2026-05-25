@@ -100,6 +100,28 @@
           @media (prefers-reduced-motion: reduce){
             .marquee__track{ animation: none; }
           }
+          
+          .back-button{
+            display: inline-block;
+            margin-top: 18px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: var(--bg1);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+          .back-button:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76,201,240,.35);
+          }
+          .back-button:active{
+            transform: translateY(0);
+          }
         </style>
     </head>
   <body>
@@ -107,7 +129,7 @@
       <div class="banner marquee" aria-label="Engineering overview ticker">
         <div class="marquee__track">
           <span>Engineering is one of the most prominent career options in the world. With the rise in AI and Machine Learning, more and more students tend to follow engineering as a career.</span>
-          <span aria-hidden="true">Engineering is one of the most prominent career options in the world. With the rise in AI and Machine Learning, more and more students tend to follow engineering as a career.</span>
+          <span aria-hidden="true">Engineering is one of the most prominent career options in the world. With the rise in AI and Machine Learning, more and more students tend to follow engineering as [...]
         </div>
       </div>
       <main class="content">
@@ -273,6 +295,8 @@
 <h2>General Quota</h2>
 <h3>Home state</h3>
 <p>Quota elegible to all students other than their category quota. </p>
+
+<a href="index.html" class="back-button">← Back to Portfolio</a>
 </main>
 </body> 
 </html>
