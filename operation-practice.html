@@ -19,10 +19,10 @@
         .hit-marker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg); font-size: 30px; color: white; display: none; text-shadow: 0px 0px 5px red; }
         .headshot-text { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); font-size: 28px; color: #ffeb3b; font-weight: bold; display: none; text-shadow: 0 0 10px orange; }
         
-        #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 40%, rgba(255,0,0,0.6) 100%); opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+        #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 40%, rgba(255,0,0,0.6) 100%); opacity: 0; transition: opacity 0.2s; }
         
         /* Tactical Zoom Scope Overlay */
-        #scope-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, #000 40%, #000 100%); display: none; pointer-events: none; z-index: 10; }
+        #scope-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, #000 40%, #000 100%); display: none; pointer-events: none; }
         #scope-reticle { position: absolute; top: 50%; left: 50%; width: 40vh; height: 40vh; border: 2px solid rgba(0, 255, 0, 0.3); border-radius: 50%; transform: translate(-50%, -50%); }
         #scope-axis-h { position: absolute; top: 50%; left: -10%; width: 120%; height: 1px; background: rgba(0, 255, 0, 0.5); }
         #scope-axis-v { position: absolute; left: 50%; top: -10%; width: 1px; height: 120%; background: rgba(0, 255, 0, 0.5); }
@@ -31,19 +31,19 @@
 
         .menu-btn { pointer-events: auto; background: rgba(255, 255, 255, 0.1); border: 1px solid #555; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .active-btn { background: rgba(0, 255, 0, 0.3); border-color: #0f0; }
-        #start-menu, #game-over-menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; }
+        #start-menu, #game-over-menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .health-bar-container { width: 300px; height: 20px; background: #222; border: 2px solid #555; }
         #health-fill { width: 100%; height: 100%; background: lime; transition: 0.2s; }
         .marquee-container { width: 100%; max-width: 600px; overflow: hidden; white-space: nowrap; margin-bottom: 2rem; background: rgba(0, 255, 0, 0.05); border: 1px solid rgba(0, 255, 0, 0.2); }
         .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 12s linear infinite; color: #4ade80; font-weight: bold; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
         
-        #dash-label { position: absolute; bottom: 132px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; font-weight: bold; color: #00f0ff; text-shadow: 0 0 5px rgba(0, 240, 255, 0.5); letter-spacing: 1px; }
-        #dash-ui { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); width: 150px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
+        #dash-label { position: absolute; bottom: 132px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; font-weight: bold; color: #00f0ff; text-shadow: 0 0 5px rgba(0, 240, 255, 0.5); letter-spacing: 2px; }
+        #dash-ui { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); width: 150px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.5); }
         #dash-fill { width: 100%; height: 100%; background: #00f0ff; transition: width 0.1s linear; }
         
         #timer-ui { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 3rem; font-weight: bold; color: #0f0; text-shadow: 0 0 10px #0f0; display: none; }
-        #defuse-prompt { position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%); color: white; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 5px; border: 1px solid #0ff; display: none; font-weight: bold; }
+        #defuse-prompt { position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%); color: white; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 5px; border: 1px solid #555; display: none; }
         #defuse-progress-container { position: absolute; top: 65%; left: 50%; transform: translateX(-50%); width: 200px; height: 10px; background: #111; border: 1px solid #555; display: none; }
         #defuse-progress-fill { width: 0%; height: 100%; background: #0ff; box-shadow: 0 0 10px #0ff; }
     </style>
@@ -81,6 +81,7 @@
         <div class="flex gap-4">
             <button id="play-btn" class="px-12 py-4 bg-green-700 font-bold text-2xl uppercase tracking-widest rounded-sm hover:bg-green-600 transition-colors shadow-lg">DEPLOY</button>
             <button id="pause-home-btn" class="px-12 py-4 bg-gray-600 font-bold text-2xl uppercase tracking-widest hidden rounded-sm hover:bg-gray-500 transition-colors text-center">GO TO HOME</button>
+            <a href="index.html" class="px-12 py-4 bg-blue-600 font-bold text-2xl uppercase tracking-widest rounded-sm hover:bg-blue-500 transition-colors shadow-lg" style="text-decoration: none; display: flex; align-items: center;">BACK TO PORTFOLIO</a>
         </div>
         <div class="mt-8 text-sm text-gray-500 text-center bg-gray-900/50 p-4 rounded border border-gray-700 max-w-2xl mx-auto">
             <p>WASD: Move | Mouse: Look | Left Click: Fire | Right Click: Zoom</p>
@@ -199,7 +200,7 @@
         }
 
         const wallMat = new THREE.MeshPhongMaterial({ color: 0x555555 }), floorMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
-        const industrialBlue = new THREE.MeshPhongMaterial({ color: 0x1e5a96 }), pipeYellow = new THREE.MeshPhongMaterial({ color: 0xccaa00 }), metalGrey = new THREE.MeshPhongMaterial({ color: 0x777777, shininess: 80 });
+        const industrialBlue = new THREE.MeshPhongMaterial({ color: 0x1e5a96 }), pipeYellow = new THREE.MeshPhongMaterial({ color: 0xccaa00 }), metalGrey = new THREE.MeshPhongMaterial({ color: 0x777777 });
         const ruinStoneMat = new THREE.MeshPhongMaterial({ color: 0xd2c0a8 });
         const marbleColumnMat = new THREE.MeshPhongMaterial({ color: 0xe8e4d9, shininess: 60 });
         const hazardMat = new THREE.MeshPhongMaterial({ color: 0xff0000, emissive: 0x440000 });
@@ -218,7 +219,7 @@
             if (config.map === 'range') {
                 const whiteWall = new THREE.MeshPhongMaterial({ color: 0xeeeeee });
                 const blackStripe = new THREE.MeshPhongMaterial({ color: 0x111111 });
-                createBox(60, 20, 1, 0, 10, -100, blackStripe); createBox(1, 20, 200, -30, 10, 0, whiteWall); createBox(1, 20, 200, 30, 10, 0, whiteWall); createBox(60, 20, 1, 0, 10, 100, blackStripe); 
+                createBox(60, 20, 1, 0, 10, -100, blackStripe); createBox(1, 20, 200, -30, 10, 0, whiteWall); createBox(1, 20, 200, 30, 10, 0, whiteWall); createBox(60, 20, 1, 0, 10, 100, blackStripe);
                 for(let i=0; i<15; i++) { const z = -90 + (i * 12); createBox(60, 2.5, 0.4, 0, 18, z, whiteWall, false).rotation.x = Math.PI / 10; }
             } else if (config.map === 'cqb') {
                 for(let i=0; i<10; i++) {
@@ -233,7 +234,7 @@
                     const lWall = new THREE.Mesh(new THREE.BoxGeometry(80, 10, 2), ruinStoneMat); lWall.position.set(0, 5, 0); facadeGroup.add(lWall); objects.push(lWall);
                     const uWall = new THREE.Mesh(new THREE.BoxGeometry(80, 10, 2), ruinStoneMat); uWall.position.set(0, 15, -0.5); facadeGroup.add(uWall); objects.push(uWall);
                     const colG = new THREE.CylinderGeometry(0.8, 0.8, 10, 12);
-                    for(let i=-3; i<=3; i++) { const c1 = new THREE.Mesh(colG, marbleColumnMat); c1.position.set(i*11, 5, 2); facadeGroup.add(c1); objects.push(c1); const c2 = new THREE.Mesh(colG, marbleColumnMat); c2.position.set(i*11, 15, 1.5); facadeGroup.add(c2); objects.push(c2); }
+                    for(let i=-3; i<=3; i++) { const c1 = new THREE.Mesh(colG, marbleColumnMat); c1.position.set(i*11, 5, 2); facadeGroup.add(c1); objects.push(c1); const c2 = new THREE.Mesh(colG, marbleColumnMat); c2.position.set(i*11, 5, -5); facadeGroup.add(c2); objects.push(c2); }
                     mapGroup.add(facadeGroup);
                 };
                 buildFacade(-80);
@@ -337,7 +338,7 @@
                     target.health -= head ? currentWeapon.damage*3 : currentWeapon.damage;
                     document.querySelector('.hit-marker').style.display='block'; setTimeout(()=>document.querySelector('.hit-marker').style.display='none', 100);
                     if(head) { document.querySelector('.headshot-text').style.display='block'; setTimeout(()=>document.querySelector('.headshot-text').style.display='none', 500); }
-                    if(target.health<=0) { config.score += head?25:10; gameStats.kills++; mapGroup.remove(target.mesh); enemies.splice(enemies.indexOf(target),1); if (enemies.length === 0) setTimeout(spawnTargets, 500); updateUI(); }
+                    if(target.health<=0) { config.score += head?25:10; gameStats.kills++; mapGroup.remove(target.mesh); enemies.splice(enemies.indexOf(target),1); if (enemies.length === 0) setTimeout(()=>die("TARGETS CLEARED"),500); }
                 } else if(hazards.includes(hitObj)) {
                     enemies.forEach(e => { if(e.mesh.position.distanceTo(hitObj.position) < 15) e.health -= 100; });
                     mapGroup.remove(hitObj); hazards.splice(hazards.indexOf(hitObj), 1);
@@ -360,7 +361,7 @@
             isDead = true; controls.unlock(); document.getElementById('ui-layer').style.display='none'; 
             document.getElementById('game-over-menu').style.display='flex'; 
             document.getElementById('end-title').innerText = reason;
-            document.getElementById('end-title').style.color = (reason === "MISSION SUCCESS" || reason === "TIME EXPIRED") ? "#00f0ff" : "#ef4444";
+            document.getElementById('end-title').style.color = (reason === "MISSION SUCCESS" || reason === "TIME EXPIRED" || reason === "TARGETS CLEARED") ? "#00f0ff" : "#ef4444";
             document.getElementById('kill-count-display').innerText = `Targets Eliminated: ${gameStats.kills}`;
             document.getElementById('stat-headshots').innerText = gameStats.headshots;
             document.getElementById('stat-shots').innerText = gameStats.shots;
@@ -499,9 +500,9 @@
         document.getElementById('main-menu-btn').onclick = goToHome;
         document.getElementById('pause-home-btn').onclick = goToHome;
         
-        document.querySelectorAll('.mode-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active-btn')); b.classList.add('active-btn'); config.mode=b.dataset.val; });
-        document.querySelectorAll('.map-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.map-btn').forEach(x=>x.classList.remove('active-btn')); b.classList.add('active-btn'); config.map=b.dataset.val; });
-        document.querySelectorAll('.time-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.time-btn').forEach(x=>x.classList.remove('active-btn')); b.classList.add('active-btn'); config.time=b.dataset.val; });
+        document.querySelectorAll('.mode-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active-btn')); b.classList.add('active-btn'); config.mode = b.dataset.val; });
+        document.querySelectorAll('.map-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.map-btn').forEach(x=>x.classList.remove('active-btn')); b.classList.add('active-btn'); config.map = b.dataset.val; });
+        document.querySelectorAll('.time-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.time-btn').forEach(x=>x.classList.remove('active-btn')); b.classList.add('active-btn'); config.time = b.dataset.val; });
         
         document.addEventListener('keydown', e => {
             if(e.code==='KeyW') moveForward=true; if(e.code==='KeyS') moveBackward=true; if(e.code==='KeyA') moveLeft=true; if(e.code==='KeyD') moveRight=true; if(e.code==='KeyF') keyF=true;
@@ -512,7 +513,7 @@
             if(e.code==='Digit1') switchWeapon('ar'); if(e.code==='Digit2') switchWeapon('sniper');
             if(e.code==='KeyR') startReload();
         });
-        document.addEventListener('keyup', e => { if(e.code==='KeyW') moveForward=false; if(e.code==='KeyS') moveBackward=false; if(e.code==='KeyA') moveLeft=false; if(e.code==='KeyD') moveRight=false; if(e.code==='KeyF') keyF=false; if(e.code.startsWith('Shift')) isSliding=false; });
+        document.addEventListener('keyup', e => { if(e.code==='KeyW') moveForward=false; if(e.code==='KeyS') moveBackward=false; if(e.code==='KeyA') moveLeft=false; if(e.code==='KeyD') moveRight=false; if(e.code==='KeyF') keyF=false; });
         
         controls.addEventListener('unlock', () => {
             if(!isDead) {
