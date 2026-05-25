@@ -259,6 +259,47 @@
         header { padding: 40px; }
         header h1 { font-size: 2.6rem; }
       }
+
+
+
+<a href="index.html" class="portfolio-text-link">
+  <svg class="link-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"></path>
+  </svg>
+  Back to Portfolio
+</a>
+
+
+  .portfolio-text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    
+  
+    color: var(--muted, #a2a0cb); 
+    width: fit-content;
+    transition: color 0.2s ease;
+  }
+
+  .link-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  
+  .portfolio-text-link:hover {
+    color: var(--accent-blue, #c084fc); /* Changes to your theme color */
+  }
+
+  
+  .portfolio-text-link:hover .link-arrow {
+    transform: translateX(-4px);
+  }
+
+
     </style>
 </head>
 <body>
