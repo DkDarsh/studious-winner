@@ -66,6 +66,31 @@
         gap: 24px;
       }
 
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--accent-blue);
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: var(--transition);
+        width: fit-content;
+        border: 1px solid transparent;
+      }
+
+      .back-link:hover {
+        background: rgba(192, 132, 252, 0.08);
+        border-color: var(--border-hover);
+        color: #ffffff;
+      }
+
+      .back-link::before {
+        content: "←";
+        font-size: 1.1rem;
+      }
       
       header {
         border: 1px solid var(--border);
@@ -263,14 +288,13 @@
 
 
 
-
-
     </style>
 </head>
 <body>
 
     <div class="container">
 
+        <a href="index.html" class="back-link">Back to Portfolio</a>
         
         <header>
             <h1>College Packing Guide</h1>
@@ -347,7 +371,7 @@
                 <ol>
                     <li>
                         <b>Laptop</b>
-                        <p>An absolute essential. Powerful computing platforms are highly recommended for technical degrees (engineering, coding, CAD rendering) while mid-range devices work great for general science or humanities.</p>
+                        <p>An absolute essential. Powerful computing platforms are highly recommended for technical degrees (engineering, coding, CAD rendering) while mid-range devices work great for other fields.</p>
                     </li>
                     <li>
                         <b>Mobile Device</b>
