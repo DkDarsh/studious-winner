@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinTrack</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            900: '#4c1d95',
+                        }
+                    },
+                    animation: {
+                        'slide-in': 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                    },
+                    keyframes: {
+                        slideIn: {
+                            '0%': { transform: 'translateY(15px) scale(0.98)', opacity: '0' },
+                            '100%': { transform: 'translateY(0) scale(1)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.2); border-radius: 4px; }
+        
+        .glass-header {
+            background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+        }
+        .dark .glass-header {
+            background: linear-gradient(135deg, #4c1d95 0%, #831843 100%);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        .health-bar-fill {
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex justify-center items-center min-h-screen m-0 p-0 transition-colors duration-300">
+
+    <div class="w-full h-[100dvh] md:h-[100vh] shadow-none md:shadow-2xl overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-900 relative border-0 md:border border-slate-200 dark:border-slate-800 transition-colors duration-300">
+        
+        <!-- Header & Balance Area -->
+        <div class="glass-header text-white p-6 pb-12 rounded-b-[2rem] shadow-lg relative z-20 shrink-0 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold flex items-center gap-2 tracking-tight">
+                    <i class="fa-solid fa-wallet opacity-80"></i> FinTrack
+                </h2>
+                <div class="flex items-center gap-2">
+                    <!-- Share Financial Sheet Button -->
+                    <button onclick="openShareSheet()" class="px-3 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center gap-2 backdrop-blur-md transition-all focus:outline-none text-xs font-semibold">
+                        <i class="fa-solid fa-share-nodes text-sm"></i> Share Sheet
+                    </button>
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex justify-center items-center backdrop-blur-md transition-all focus:outline-none">
+                        <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <p class="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1">Total Balance</p>
+                <h1 class="text-5xl font-extrabold tracking-tight" id="balance">₹0.00</h1>
+            </div>
+
+            <!-- Visual Budget Health Bar -->
+            <div class="w-full bg-white/20 rounded-full h-1.5 mb-2 overflow-hidden backdrop-blur-sm">
+                <div id="health-bar" class="health-bar-fill bg-emerald-400 h-1.5 rounded-full" style="width: 50%;"></div>
+            </div>
+            <div class="flex justify-between text-[10px] font-medium text-white/70 uppercase tracking-wider">
+                <span>Credit Ratio</span>
+                <span id="health-percentage">50%</span>
+            </div>
+        </div>
+
+        <!-- Credit and Debit Overview Cards -->
+        <div class="relative z-30 -mt-8 mx-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex p-4 border border-slate-100 dark:border-slate-700 transition-colors duration-300 shrink-0">
+            <div class="flex-1 text-center border-r border-slate-100 dark:border-slate-700">
+                <div class="flex items-center justify-center gap-1 mb-1">
+                    <i class="fa-solid fa-arrow-up text-emerald-500 text-xs"></i>
+                    <p class="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase">Credit</p>
+                </div>
+                <p class="text-slate-800 dark:text-slate-100 text-lg font-bold truncate px-2" id="money-plus">₹0.00</p>
+            </div>
+            <div class="flex-1 text-center">
+                <div class="flex items-center justify-center gap-1 mb-1">
+                    <i class="fa-solid fa-arrow-down text-rose-500 text-xs"></i>
+                    <p class="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase">Debit</p>
+                </div>
+                <p class="text-slate-800 dark:text-slate-100 text-lg font-bold truncate px-2" id="money-minus">₹0.00</p>
+            </div>
+        </div>
+
+        <!-- Expanded History Section -->
+        <div class="flex-1 overflow-y-auto px-6 pt-6 pb-4 z-10 flex flex-col min-h-0">
+            <div class="flex justify-between items-center mb-3 sticky top-0 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md py-2 z-10">
+                <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">History</h3>
+                <button onclick="clearAll()" class="text-xs text-rose-500 hover:text-rose-600 font-semibold px-2 py-1 rounded bg-rose-50 dark:bg-rose-900/20 transition-colors">Clear All</button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto pr-1">
+                <ul id="list" class="space-y-3 pb-4">
+                    <!-- Transactions injected via JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Transaction Form Input Panel -->
+        <div class="glass-panel border-t border-slate-200/50 dark:border-slate-700/50 p-4 md:p-6 shrink-0 z-20">
+            <div id="error-msg" class="hidden bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs font-bold p-2 mb-2 rounded-xl flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="error-text">Error</span>
+            </div>
+
+            <form id="form" class="flex flex-col gap-2.5 max-w-4xl mx-auto w-full">
+                <div class="flex gap-3">
+                    <select id="category" class="w-1/2 sm:w-2/5 px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-semibold shadow-sm appearance-none">
+                        <option value="Food & Drinks">Food & Drinks</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Shopping">Shop</option>
+                        <option value="Bills">Bills</option>
+                        <option value="Money Received">Money Received</option>
+                    </select>
+                    <div class="flex-1 relative shadow-sm rounded-xl">
+                        <input type="text" id="text" placeholder="Description..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm placeholder-slate-400">
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <div class="w-1/2 relative shadow-sm rounded-xl">
+                        <input type="date" id="transaction-date" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-xs font-medium">
+                    </div>
+                    <div class="w-1/2 flex gap-2">
+                        <select id="type" class="w-1/2 px-2 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-medium shadow-sm text-center appearance-none">
+                            <option value="debit">- Debit</option>
+                            <option value="credit">+ Credit</option>
+                        </select>
+                        <button type="submit" class="w-1/2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none flex justify-center items-center active:scale-95">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 hidden">
+                    <input type="number" id="amount" placeholder="0.00" step="1" min="1">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Financial Sheet Modal -->
+    <div id="share-sheet-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice-dollar text-brand-500"></i> Detailed Financial Summary
+                </h3>
+                <button onclick="closeShareSheet()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-all">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Share this structured statement with your parents or friends via WhatsApp, or copy to clipboard.</p>
+
+            <div class="flex-1 bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-y-auto mb-4 font-mono text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap select-all leading-relaxed" id="sheet-preview-text">
+                Generating summary...
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="copyFinancialSheet()" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs">
+                    <i class="fa-regular fa-copy"></i> Copy Text
+                </button>
+                <a id="whatsapp-share-btn" href="#" target="_blank" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs shadow-md shadow-emerald-200 dark:shadow-none">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const localStorageTransactions = JSON.parse(localStorage.getItem('transactions'));
+        let transactions = localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
+
+        const balanceEl = document.getElementById('balance');
+        const incomeEl = document.getElementById('money-plus');
+        const expenseEl = document.getElementById('money-minus');
+        const listEl = document.getElementById('list');
+        const formEl = document.getElementById('form');
+        const textEl = document.getElementById('text');
+        const amountEl = document.getElementById('amount');
+        const typeEl = document.getElementById('type');
+        const categoryEl = document.getElementById('category');
+        const dateEl = document.getElementById('transaction-date');
+        const errorMsgEl = document.getElementById('error-msg');
+        const errorTextEl = document.getElementById('error-text');
+        const healthBarEl = document.getElementById('health-bar');
+        const healthPercentageEl = document.getElementById('health-percentage');
+        
+        const htmlElement = document.documentElement;
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        function setDefaultLocalDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            dateEl.value = `${year}-${month}-${day}`;
+        }
+        setDefaultLocalDate();
+
+        function formatRupees(num) {
+            return parseFloat(num).toLocaleString('en-IN', {
+                minimumFractionDigits: 2, maximumFractionDigits: 2
+            });
+        }
+
+        function formatDate(dateString) {
+            const parts = dateString.split('T')[0].split('-');
+            if (parts.length === 3) {
+                const date = new Date(parts[0], parts[1] - 1, parts[2]);
+                return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function toggleTheme() {
+            htmlElement.classList.toggle('dark');
+            const isDark = htmlElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeIcon.className = isDark ? 'fa-solid fa-sun text-lg' : 'fa-solid fa-moon text-lg';
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            themeIcon.className = 'fa-solid fa-sun text-lg';
+        }
+
+        function extractAmount(text) {
+            const match = text.match(/(?:rs\.?|inr|₹)?\s*(\d+(?:\.\d+)?)/i);
+            return match ? parseFloat(match[1]) : NaN;
+        }
+
+        textEl.addEventListener('input', (e) => {
+            const val = e.target.value;
+            const detected = extractAmount(val);
+            if (!isNaN(detected) && detected > 0) {
+                amountEl.value = detected;
+            }
+        });
+
+        categoryEl.addEventListener('change', (e) => {
+            if (e.target.value === 'Money Received') {
+                typeEl.value = 'credit';
+            }
+        });
+
+        function addTransaction(e) {
+            e.preventDefault();
+
+            const text = textEl.value.trim();
+            let amountValue = amountEl.value.trim();
+            
+            if (!amountValue) {
+                const detected = extractAmount(text);
+                if (!isNaN(detected)) {
+                    amountValue = detected;
+                }
+            }
+
+            const type = typeEl.value;
+            const category = categoryEl.value;
+            const customDate = dateEl.value;
+
+            if (text === '' || amountValue === '') {
+                showError('Please enter a description and amount.');
+                return;
+            }
+
+            const amount = parseFloat(amountValue);
+            if (amount <= 0 || isNaN(amount)) {
+                showError('Please enter a valid amount.');
+                return;
+            }
+
+            hideError();
+
+            const transaction = {
+                id: Math.floor(Math.random() * 100000000),
+                text: text,
+                amount: type === 'debit' ? -Math.abs(amount) : Math.abs(amount),
+                category: category,
+                date: customDate ? customDate : new Date().toISOString().split('T')[0]
+            };
+
+            transactions.push(transaction);
+            updateLocalStorage();
+            
+            init();
+
+            textEl.value = '';
+            amountEl.value = '';
+            setDefaultLocalDate();
+        }
+
+        function showError(message) {
+            errorTextEl.innerText = message;
+            errorMsgEl.classList.remove('hidden');
+            setTimeout(hideError, 3000);
+        }
+
+        function hideError() {
+            errorMsgEl.classList.add('hidden');
+        }
+
+        const categoryIcons = {
+            'Food & Drinks': '<i class="fa-solid fa-burger text-orange-500"></i>',
+            'Transport': '<i class="fa-solid fa-car text-blue-500"></i>',
+            'Shopping': '<i class="fa-solid fa-bag-shopping text-pink-500"></i>',
+            'Bills': '<i class="fa-solid fa-bolt text-yellow-500"></i>',
+            'Money Received': '<i class="fa-solid fa-hand-holding-dollar text-emerald-500"></i>'
+        };
+
+        function addTransactionDOM(transaction) {
+            const isCredit = transaction.amount > 0;
+            const sign = isCredit ? '+' : '-';
+            const iconStr = categoryIcons[transaction.category] || categoryIcons['Food & Drinks'];
+
+            const item = document.createElement('li');
+            item.classList.add(
+                'animate-slide-in', 'bg-white', 'dark:bg-slate-800', 'rounded-2xl', 'p-3.5', 
+                'flex', 'justify-between', 'items-center', 'shadow-sm', 'border', 
+                'border-slate-100', 'dark:border-slate-700/50', 'group'
+            );
+
+            item.innerHTML = `
+                <div class="flex items-center gap-3.5 overflow-hidden">
+                    <div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-700/50 flex justify-center items-center shrink-0 shadow-inner">
+                        ${iconStr}
+                    </div>
+                    <div class="flex flex-col truncate pr-2">
+                        <p class="font-bold text-slate-700 dark:text-slate-200 truncate text-sm">${transaction.text}</p>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">${formatDate(transaction.date)} • <span class="uppercase font-semibold">${transaction.category}</span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <span class="font-bold tracking-tight text-sm ${isCredit ? 'text-emerald-500' : 'text-slate-800 dark:text-slate-100'}">
+                        ${sign}₹${formatRupees(Math.abs(transaction.amount))}
+                    </span>
+                    <button onclick="removeTransaction(${transaction.id})" class="w-8 h-8 flex justify-center items-center text-slate-300 hover:text-rose-500 dark:text-slate-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-full transition-all focus:outline-none shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `;
+            
+            listEl.prepend(item);
+        }
+
+        function updateValues() {
+            const amounts = transactions.map(t => t.amount);
+            const total = amounts.reduce((acc, item) => (acc += item), 0);
+            const credit = amounts.filter(item => item > 0).reduce((acc, item) => (acc += item), 0);
+            const debit = amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1;
+
+            const totalSign = total < 0 ? '-' : '';
+            balanceEl.innerText = `${totalSign}₹${formatRupees(Math.abs(total))}`;
+            incomeEl.innerText = `₹${formatRupees(credit)}`;
+            expenseEl.innerText = `₹${formatRupees(debit)}`;
+            
+            let ratio = 50; 
+            if (credit > 0 || debit > 0) {
+                ratio = (credit / (credit + debit)) * 100;
+            }
+            healthBarEl.style.width = `${ratio}%`;
+            healthPercentageEl.innerText = `${Math.round(ratio)}%`;
+            
+            if(ratio < 30) healthBarEl.className = 'health-bar-fill bg-rose-400 h-1.5 rounded-full';
+            else if(ratio < 70) healthBarEl.className = 'health-bar-fill bg-yellow-400 h-1.5 rounded-full';
+            else healthBarEl.className = 'health-bar-fill bg-emerald-400 h-1.5 rounded-full';
+
+            if (transactions.length === 0) {
+                listEl.innerHTML = `
+                    <div id="empty-state" class="text-center py-12 flex flex-col items-center justify-center h-full animate-fade-in">
+                        <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-receipt text-2xl text-slate-300 dark:text-slate-600"></i>
+                        </div>
+                        <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">No records found</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Your transaction history will appear here.</p>
+                    </div>
+                `;
+            } else {
+                const emptyState = document.getElementById('empty-state');
+                if (emptyState) emptyState.remove();
+            }
+        }
+
+        function removeTransaction(id) {
+            transactions = transactions.filter(transaction => transaction.id !== id);
+            updateLocalStorage();
+            init();
+        }
+
+        function clearAll() {
+            if(transactions.length > 0) {
+                transactions = [];
+                updateLocalStorage();
+                init();
+            }
+        }
+
+        function updateLocalStorage() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        function generateFinancialSummaryText() {
+            const amounts = transactions.map(t => t.amount);
+            const total = amounts.reduce((acc, item) => (acc += item), 0);
+            const credit = amounts.filter(item => item > 0).reduce((acc, item) => (acc += item), 0);
+            const debit = amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1;
+
+            let text = `FINANCIAL SUMMARY STATEMENT \n`;
+            text += `----------------------------------------\n`;
+            text += `• Total Balance: ₹${formatRupees(total)}\n`;
+            text += `• Total Credit (+): ₹${formatRupees(credit)}\n`;
+            text += `• Total Debit (-): ₹${formatRupees(debit)}\n`;
+            text += `----------------------------------------\n`;
+            text += `TRANSACTION HISTORY:\n`;
+
+            if (transactions.length === 0) {
+                text += `(No transactions recorded yet)\n`;
+            } else {
+                const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+                sorted.forEach(t => {
+                    const sign = t.amount > 0 ? '+' : '-';
+                    text += `[${formatDate(t.date)}] ${t.text} (${t.category}): ${sign}₹${formatRupees(Math.abs(t.amount))}\n`;
+                });
+            }
+            text += `----------------------------------------\n`;
+            text += `Generated via FinTrack Budget Planner`;
+            return text;
+        }
+
+        function openShareSheet() {
+            const summary = generateFinancialSummaryText();
+            document.getElementById('sheet-preview-text').innerText = summary;
+            
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(summary)}`;
+            document.getElementById('whatsapp-share-btn').setAttribute('href', whatsappUrl);
+            
+            document.getElementById('share-sheet-modal').classList.remove('hidden');
+        }
+
+        function closeShareSheet() {
+            document.getElementById('share-sheet-modal').classList.add('hidden');
+        }
+
+        function copyFinancialSheet() {
+            const summary = generateFinancialSheetText();
+            const textArea = document.createElement('textarea');
+            textArea.value = summary;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showError('Financial sheet copied to clipboard!');
+            } catch (err) {
+                showError('Failed to copy text.');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function init() {
+            listEl.innerHTML = '';
+            const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            sorted.forEach(addTransactionDOM);
+            updateValues();
+        }
+
+        formEl.addEventListener('submit', addTransaction);
+
+        init();
+    </script>
+</body>
+</html>
