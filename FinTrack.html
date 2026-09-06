@@ -269,12 +269,14 @@
             themeIcon.className = isDark ? 'fa-solid fa-sun text-lg' : 'fa-solid fa-moon text-lg';
         }
 
-        themeToggle.addEventListener('click', toggleTheme);
+        if (themeToggle) {
+            themeToggle.addEventListener('click', toggleTheme);
+        }
         
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             htmlElement.classList.add('dark');
-            themeIcon.className = 'fa-solid fa-sun text-lg';
+            if (themeIcon) themeIcon.className = 'fa-solid fa-sun text-lg';
         }
 
         categoryEl.addEventListener('change', (e) => {
@@ -334,12 +336,11 @@
         }
 
         const categoryIcons = {
-            'Money Received': '<i class="fa-solid fa-hand-holding-dollar text-emerald-500"></i>'
             'Food & Drinks': '<i class="fa-solid fa-burger text-orange-500"></i>',
             'Transport': '<i class="fa-solid fa-car text-blue-500"></i>',
             'Shopping': '<i class="fa-solid fa-bag-shopping text-pink-500"></i>',
             'Bills': '<i class="fa-solid fa-bolt text-yellow-500"></i>',
-            
+            'Money Received': '<i class="fa-solid fa-hand-holding-dollar text-emerald-500"></i>'
         };
 
         function addTransactionDOM(transaction) {
@@ -442,7 +443,7 @@
             const credit = amounts.filter(item => item > 0).reduce((acc, item) => (acc += item), 0);
             const debit = amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1;
 
-            let text = `FINANCIAL SUMMARY STATEMENT \n`;
+            let text = `FINANCIAL SUMMARY STATEMENT\n`;
             text += `----------------------------------------\n`;
             text += `• Total Balance: ₹${formatRupees(total)}\n`;
             text += `• Total Credit (+): ₹${formatRupees(credit)}\n`;
