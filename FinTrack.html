@@ -149,34 +149,37 @@
             <form id="form" class="flex flex-col gap-2.5 max-w-4xl mx-auto w-full">
                 <div class="flex gap-3">
                     <select id="category" class="w-1/2 sm:w-2/5 px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-semibold shadow-sm appearance-none">
+                        <option value="Money Received">Money Received</option>
                         <option value="Food & Drinks">Food & Drinks</option>
                         <option value="Transport">Transport</option>
                         <option value="Shopping">Shop</option>
                         <option value="Bills">Bills</option>
-                        <option value="Money Received">Money Received</option>
+                        
                     </select>
                     <div class="flex-1 relative shadow-sm rounded-xl">
                         <input type="text" id="text" placeholder="Description..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm placeholder-slate-400">
                     </div>
                 </div>
 
+                <!-- Dedicated Amount Section -->
                 <div class="flex gap-3">
                     <div class="w-1/2 relative shadow-sm rounded-xl">
-                        <input type="date" id="transaction-date" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-xs font-medium">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm">₹</div>
+                        <input type="number" id="amount" placeholder="0.00" step="1" min="1" class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-bold">
                     </div>
-                    <div class="w-1/2 flex gap-2">
-                        <select id="type" class="w-1/2 px-2 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-medium shadow-sm text-center appearance-none">
-                            <option value="debit">- Debit</option>
-                            <option value="credit">+ Credit</option>
-                        </select>
-                        <button type="submit" class="w-1/2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none flex justify-center items-center active:scale-95">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
+                    <div class="w-1/2 relative shadow-sm rounded-xl">
+                        <input type="date" id="transaction-date" class="w-full px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-xs font-medium">
                     </div>
                 </div>
-                
-                <div class="flex gap-3 hidden">
-                    <input type="number" id="amount" placeholder="0.00" step="1" min="1">
+
+                <div class="flex gap-3">
+                    <select id="type" class="w-1/2 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-semibold shadow-sm text-center appearance-none">
+                        <option value="debit">- Debit (Expense)</option>
+                        <option value="credit">+ Credit (Income)</option>
+                    </select>
+                    <button type="submit" class="w-1/2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none flex justify-center items-center gap-2 active:scale-95 text-sm">
+                        <i class="fa-solid fa-paper-plane"></i> Add Transaction
+                    </button>
                 </div>
             </form>
         </div>
@@ -194,7 +197,7 @@
                 </button>
             </div>
             
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Share this structured statement with your parents or friends via WhatsApp, or copy to clipboard.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Share this structured statement with your parents or friends via WhatsApp, Email, or copy to clipboard.</p>
 
             <div class="flex-1 bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-y-auto mb-4 font-mono text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap select-all leading-relaxed" id="sheet-preview-text">
                 Generating summary...
@@ -274,19 +277,6 @@
             themeIcon.className = 'fa-solid fa-sun text-lg';
         }
 
-        function extractAmount(text) {
-            const match = text.match(/(?:rs\.?|inr|₹)?\s*(\d+(?:\.\d+)?)/i);
-            return match ? parseFloat(match[1]) : NaN;
-        }
-
-        textEl.addEventListener('input', (e) => {
-            const val = e.target.value;
-            const detected = extractAmount(val);
-            if (!isNaN(detected) && detected > 0) {
-                amountEl.value = detected;
-            }
-        });
-
         categoryEl.addEventListener('change', (e) => {
             if (e.target.value === 'Money Received') {
                 typeEl.value = 'credit';
@@ -297,27 +287,19 @@
             e.preventDefault();
 
             const text = textEl.value.trim();
-            let amountValue = amountEl.value.trim();
-            
-            if (!amountValue) {
-                const detected = extractAmount(text);
-                if (!isNaN(detected)) {
-                    amountValue = detected;
-                }
-            }
-
+            const amountValue = amountEl.value.trim();
             const type = typeEl.value;
             const category = categoryEl.value;
             const customDate = dateEl.value;
 
             if (text === '' || amountValue === '') {
-                showError('Please enter a description and amount.');
+                showError('Please enter both description and amount.');
                 return;
             }
 
             const amount = parseFloat(amountValue);
             if (amount <= 0 || isNaN(amount)) {
-                showError('Please enter a valid amount.');
+                showError('Please enter a valid positive amount.');
                 return;
             }
 
@@ -352,11 +334,12 @@
         }
 
         const categoryIcons = {
+            'Money Received': '<i class="fa-solid fa-hand-holding-dollar text-emerald-500"></i>'
             'Food & Drinks': '<i class="fa-solid fa-burger text-orange-500"></i>',
             'Transport': '<i class="fa-solid fa-car text-blue-500"></i>',
             'Shopping': '<i class="fa-solid fa-bag-shopping text-pink-500"></i>',
             'Bills': '<i class="fa-solid fa-bolt text-yellow-500"></i>',
-            'Money Received': '<i class="fa-solid fa-hand-holding-dollar text-emerald-500"></i>'
+            
         };
 
         function addTransactionDOM(transaction) {
@@ -371,6 +354,9 @@
                 'border-slate-100', 'dark:border-slate-700/50', 'group'
             );
 
+            // Debits shown in red/rose, Credits shown in emerald/green
+            const amountColorClass = isCredit ? 'text-emerald-500' : 'text-rose-500 dark:text-rose-400';
+
             item.innerHTML = `
                 <div class="flex items-center gap-3.5 overflow-hidden">
                     <div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-700/50 flex justify-center items-center shrink-0 shadow-inner">
@@ -382,7 +368,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
-                    <span class="font-bold tracking-tight text-sm ${isCredit ? 'text-emerald-500' : 'text-slate-800 dark:text-slate-100'}">
+                    <span class="font-bold tracking-tight text-sm ${amountColorClass}">
                         ${sign}₹${formatRupees(Math.abs(transaction.amount))}
                     </span>
                     <button onclick="removeTransaction(${transaction.id})" class="w-8 h-8 flex justify-center items-center text-slate-300 hover:text-rose-500 dark:text-slate-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-full transition-all focus:outline-none shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100">
