@@ -102,7 +102,7 @@
                         <i class="fa-solid fa-wallet opacity-90"></i>
                         <span>FinTrack</span>
                     </h2>
-                    <select id="account-selector" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none pr-6 sm:pr-8 relative ml-1 sm:ml-2 max-w-[130px] sm:max-w-none text-ellipsis overflow-hidden" onchange="handleAccountChange(event)">
+                    <select id="account-selector" class="bg-black/10 hover:bg-black/20 text-white border border-white/30 backdrop-blur-md rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none pr-8 sm:pr-10 relative ml-2 shadow-inner cursor-pointer transition-all truncate max-w-[140px] sm:max-w-[200px]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1rem;" onchange="handleAccountChange(event)">
                     </select>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap justify-end">
@@ -188,41 +188,29 @@
     </div>
 
     <div id="add-transaction-modal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col max-h-[90vh] overflow-y-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col max-h-[90vh] overflow-y-auto relative">
+            
+            <div id="ai-loading-overlay" class="absolute inset-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm z-10 hidden flex-col items-center justify-center rounded-3xl">
+                <i class="fa-solid fa-wand-magic-sparkles fa-bounce text-4xl text-brand-500 mb-3"></i>
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-100" id="ai-loading-text">Analyzing with FinAI...</p>
+            </div>
+
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-plus-circle text-brand-500"></i> New Transaction
                 </h3>
-                <button onclick="closeAddTransactionModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-all focus:outline-none">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="document.getElementById('receipt-upload').click()" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm border border-brand-100 dark:border-brand-800" title="Scan Receipt with AI">
+                        <i class="fa-solid fa-camera"></i> <span class="hidden sm:inline">Scan Receipt</span>
+                    </button>
+                    <input type="file" id="receipt-upload" accept="image/*" class="hidden" onchange="handleReceiptUpload(event)">
+                    <button type="button" onclick="closeAddTransactionModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-all focus:outline-none ml-1">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
             </div>
             
             <form id="form" class="flex flex-col gap-4">
-                <div class="p-3 bg-gradient-to-r from-brand-50 to-pink-50 dark:from-brand-900/20 dark:to-pink-900/20 rounded-xl border border-brand-100 dark:border-brand-800/50">
-                    <label class="text-[10px] font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles"></i> Smart Add</label>
-                    <div class="flex gap-2 mt-2">
-                        <input type="text" id="smart-input" placeholder="e.g., Spent 500 on groceries yesterday..." class="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-brand-200 dark:border-brand-700 bg-white/50 dark:bg-slate-900/50 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-xs placeholder-slate-400">
-                        <button type="button" id="smart-add-btn" onclick="parseSmartInput()" class="bg-brand-600 hover:bg-brand-700 text-white px-3 sm:px-4 rounded-xl transition-all shadow-md active:scale-95 text-sm flex items-center justify-center shrink-0 min-w-[36px]" title="Process Text">
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-3 gap-1.5 mt-2">
-                        <button type="button" id="mic-btn" onclick="startSpeechRecognition()" class="bg-white dark:bg-slate-800 border border-brand-200 dark:border-brand-700 text-brand-600 dark:text-brand-400 text-[10px] sm:text-xs py-2 px-1 rounded-xl flex items-center justify-center gap-1 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors shadow-sm focus:outline-none truncate">
-                            <i class="fa-solid fa-microphone shrink-0"></i> <span class="truncate">Speak</span>
-                        </button>
-                        <button type="button" onclick="document.getElementById('camera-input').click()" class="bg-white dark:bg-slate-800 border border-brand-200 dark:border-brand-700 text-brand-600 dark:text-brand-400 text-[10px] sm:text-xs py-2 px-1 rounded-xl flex items-center justify-center gap-1 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors shadow-sm focus:outline-none truncate">
-                            <i class="fa-solid fa-camera shrink-0"></i> <span class="truncate">Scan</span>
-                        </button>
-                        <button type="button" onclick="document.getElementById('file-input').click()" class="bg-white dark:bg-slate-800 border border-brand-200 dark:border-brand-700 text-brand-600 dark:text-brand-400 text-[10px] sm:text-xs py-2 px-1 rounded-xl flex items-center justify-center gap-1 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors shadow-sm focus:outline-none truncate">
-                            <i class="fa-solid fa-file-arrow-up shrink-0"></i> <span class="truncate">Upload</span>
-                        </button>
-                        
-                        <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleBillUpload(event)">
-                        <input type="file" id="file-input" accept="image/*,application/pdf" class="hidden" onchange="handleBillUpload(event)">
-                    </div>
-                </div>
-
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type & Category</label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -254,7 +242,7 @@
                         <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Amount</label>
                         <div class="relative shadow-sm rounded-xl">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm currency-symbol">₹</div>
-                            <input type="number" id="amount" placeholder="0.00" step="1" min="1" class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-bold">
+                            <input type="number" id="amount" placeholder="0.00" step="0.01" min="0.01" class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-bold">
                         </div>
                     </div>
                     <div class="w-1/2 flex flex-col gap-1.5">
@@ -340,7 +328,7 @@
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Target Amount</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm currency-symbol">₹</div>
-                            <input type="number" id="goal-target" placeholder="0.00" step="1" min="1" required class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-bold">
+                            <input type="number" id="goal-target" placeholder="0.00" step="0.01" min="0.01" required class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-bold">
                         </div>
                     </div>
                     <div class="flex gap-2 mt-2">
@@ -360,7 +348,7 @@
                 <input type="hidden" id="fund-goal-id">
                 <div class="relative shadow-sm rounded-xl mb-2">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm currency-symbol">₹</div>
-                    <input type="number" id="fund-amount" placeholder="Amount" step="1" min="1" required class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-lg font-bold text-center">
+                    <input type="number" id="fund-amount" placeholder="Amount" step="0.01" min="0.01" required class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-lg font-bold text-center">
                 </div>
                 <div class="flex gap-2">
                     <button type="button" onclick="closeAddFundsModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-bold py-3 rounded-xl transition-all text-sm">Cancel</button>
@@ -464,7 +452,7 @@
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Monthly Limit</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm currency-symbol">₹</div>
-                            <input type="number" id="budget-limit" placeholder="0.00" step="1" min="1" required class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-bold">
+                            <input type="number" id="budget-limit" placeholder="0.00" step="0.01" min="0.01" required class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-bold">
                         </div>
                     </div>
                     <div class="flex gap-2 mt-2">
@@ -518,23 +506,33 @@
     </div>
 
     <div id="ai-advisor-modal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col h-[85vh] max-h-[700px]">
             <div class="flex justify-between items-center mb-4 shrink-0">
                 <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-robot text-brand-500"></i> FinAI Financial Advisor
+                    <i class="fa-solid fa-robot text-brand-500"></i> FinAI Chat
                 </h3>
                 <div class="flex gap-2">
-                    <button onclick="predictCashFlow()" class="px-3 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-bold hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-line"></i> Predict
-                    </button>
                     <button onclick="closeAIAdvisor()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-all">
                         <i class="fa-solid fa-xmark text-sm"></i>
                     </button>
                 </div>
             </div>
             
-            <div id="ai-advisor-content" class="flex-1 overflow-y-auto min-h-0 text-sm text-slate-700 dark:text-slate-300 space-y-4 leading-relaxed pr-2">
-                <!-- Content injected here -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 rounded-2xl p-4 space-y-4 mb-4 border border-slate-100 dark:border-slate-700/50">
+                <!-- Messages -->
+            </div>
+
+            <div class="flex gap-2 shrink-0 mb-2 overflow-x-auto pb-1" id="chat-quick-actions">
+                <button onclick="sendChatMessage('Give me a summary of my finances.')" class="whitespace-nowrap px-3 py-1.5 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full text-xs font-semibold transition-colors border border-brand-200 dark:border-brand-800/50">Summary</button>
+                <button onclick="sendChatMessage('Predict my cash flow for the rest of the month.')" class="whitespace-nowrap px-3 py-1.5 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full text-xs font-semibold transition-colors border border-brand-200 dark:border-brand-800/50">Predict Trends</button>
+                <button onclick="sendChatMessage('Where can I cut back on spending?')" class="whitespace-nowrap px-3 py-1.5 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full text-xs font-semibold transition-colors border border-brand-200 dark:border-brand-800/50">Cut Expenses</button>
+            </div>
+            
+            <div class="flex gap-2 shrink-0 mt-auto">
+                <input type="text" id="chat-input" placeholder="Ask about your spending..." class="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                <button onclick="sendChatMessage()" class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-3 rounded-xl font-bold transition-all shadow-md shadow-brand-200 dark:shadow-none flex items-center justify-center focus:outline-none">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -626,291 +624,68 @@
             }
         }
 
-        function startSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                showToast("Speech recognition is not supported in this browser.", "error");
-                return;
-            }
-            
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+        let finAiChatHistory = [];
 
-            const micBtn = document.getElementById('mic-btn');
-            const originalHtml = micBtn.innerHTML;
-
-            recognition.onstart = function() {
-                micBtn.innerHTML = '<i class="fa-solid fa-microphone-lines fa-fade text-rose-500"></i> Listening...';
-                micBtn.classList.add('border-rose-300', 'dark:border-rose-700', 'bg-rose-50', 'dark:bg-rose-900/20');
-            };
-
-            recognition.onresult = function(event) {
-                const speechResult = event.results[0][0].transcript;
-                document.getElementById('smart-input').value = speechResult;
-                parseSmartInput();
-            };
-
-            recognition.onerror = function(event) {
-                showToast("Microphone error: " + event.error, "error");
-            };
-            
-            recognition.onend = function() {
-                micBtn.innerHTML = originalHtml;
-                micBtn.classList.remove('border-rose-300', 'dark:border-rose-700', 'bg-rose-50', 'dark:bg-rose-900/20');
-            };
-
-            recognition.start();
-        }
-
-        async function handleBillUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const btn = document.getElementById('smart-add-btn');
-            const originalIcon = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-            btn.disabled = true;
-
-            showToast("Scanning document with FinAI...", "success");
-
-            try {
-                const base64Data = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = error => reject(error);
-                    reader.readAsDataURL(file);
-                });
-
-                const today = new Date().toISOString().split('T')[0];
-                const sym = getCurrencySymbol();
-                
-                const systemPrompt = `You are FinAI, a financial transaction parser. Extract details from this receipt/bill and return a JSON object with this exact schema:
-                {
-                    "text": "short string description (merchant/store name)",
-                    "amount": number (positive float, the total bill amount),
-                    "type": "debit" (unless it explicitly says refund/income, assume debit),
-                    "category": "string (Pick best fit from: Money Received, Food & Drinks, Transport, Shopping, Bills. If none fit well, invent a short 1-2 word category)",
-                    "date": "YYYY-MM-DD" (Extract the date from the bill. If none found, use ${today}),
-                    "tags": ["array", "of", "strings", "representing", "keywords"]
-                }
-                Do not include markdown backticks or any other text, ONLY valid JSON. Note that currency is ${sym}, so ignore currency words/symbols when extracting amount.`;
-
-                const payload = {
-                    contents: [{
-                        role: "user",
-                        parts: [
-                            { text: "Extract transaction details from this receipt file." },
-                            {
-                                inlineData: {
-                                    mimeType: file.type,
-                                    data: base64Data
-                                }
-                            }
-                        ]
-                    }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    generationConfig: { responseMimeType: "application/json" }
-                };
-
-                const apiKey = "";
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-                const res = await fetchWithRetry(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await res.json();
-                if (data.candidates && data.candidates.length > 0) {
-                    const jsonStr = data.candidates[0].content.parts[0].text;
-                    const parsed = JSON.parse(jsonStr);
-                    
-                    document.getElementById('text').value = parsed.text;
-                    document.getElementById('amount').value = parsed.amount;
-                    document.getElementById('type').value = parsed.type;
-                    document.getElementById('transaction-date').value = parsed.date || today;
-                    if (parsed.tags) document.getElementById('tags').value = parsed.tags.join(', ');
-                    
-                    let catSelect = document.getElementById('category');
-                    let found = Array.from(catSelect.options).find(o => o.value.toLowerCase() === parsed.category.toLowerCase());
-                    
-                    if (found) {
-                        catSelect.value = found.value;
-                    } else {
-                        appData.customCategories.push({ name: parsed.category, type: parsed.type });
-                        updateLocalStorage();
-                        renderCategoryOptions();
-                        catSelect.value = parsed.category;
-                    }
-                    
-                    showToast("Document scanned by FinAI! Review and save.", "success");
-                } else {
-                    showToast("Could not extract details from the file.", "error");
-                }
-            } catch (e) {
-                console.error(e);
-                showToast("Failed to process the document.", "error");
-            } finally {
-                btn.innerHTML = originalIcon;
-                btn.disabled = false;
-                event.target.value = '';
-            }
-        }
-
-        async function parseSmartInput() {
-            const inputEl = document.getElementById('smart-input');
-            const input = inputEl.value.trim();
-            if(!input) return;
-            
-            const btn = document.getElementById('smart-add-btn');
-            const originalIcon = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-            btn.disabled = true;
-            
-            const today = new Date().toISOString().split('T')[0];
-            const sym = getCurrencySymbol();
-            
-            const systemPrompt = `You are FinAI, a financial transaction parser. Extract details from the user's input and return a JSON object with this exact schema:
-            {
-                "text": "short string description",
-                "amount": number (positive float),
-                "type": "credit" or "debit",
-                "category": "string (Pick best fit from: Money Received, Food & Drinks, Transport, Shopping, Bills. If none fit well, invent a short 1-2 word category)",
-                "date": "YYYY-MM-DD" (Infer from context. Today is ${today}),
-                "tags": ["array", "of", "strings"]
-            }
-            Do not include markdown backticks, ONLY valid JSON. Currency is ${sym}.`;
-            
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: input }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                generationConfig: { responseMimeType: "application/json" }
-            };
-            
-            const apiKey = "";
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-            
-            try {
-                const res = await fetchWithRetry(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await res.json();
-                if (data.candidates && data.candidates.length > 0) {
-                    const jsonStr = data.candidates[0].content.parts[0].text;
-                    const parsed = JSON.parse(jsonStr);
-                    
-                    document.getElementById('text').value = parsed.text;
-                    document.getElementById('amount').value = parsed.amount;
-                    document.getElementById('type').value = parsed.type;
-                    document.getElementById('transaction-date').value = parsed.date || today;
-                    if (parsed.tags) document.getElementById('tags').value = parsed.tags.join(', ');
-                    
-                    let catSelect = document.getElementById('category');
-                    let found = Array.from(catSelect.options).find(o => o.value.toLowerCase() === parsed.category.toLowerCase());
-                    
-                    if (found) {
-                        catSelect.value = found.value;
-                    } else {
-                        appData.customCategories.push({ name: parsed.category, type: parsed.type });
-                        updateLocalStorage();
-                        renderCategoryOptions();
-                        catSelect.value = parsed.category;
-                    }
-                    
-                    inputEl.value = '';
-                    showToast("FinAI magic applied! Review and save.", "success");
-                }
-            } catch(e) {
-                console.error(e);
-                showToast("FinAI couldn't understand that. Please try again.", "error");
-            } finally {
-                btn.innerHTML = originalIcon;
-                btn.disabled = false;
-            }
-        }
-
-        async function openAIAdvisor() {
+        function openAIAdvisor() {
             document.getElementById('ai-advisor-modal').classList.remove('hidden');
-            const contentDiv = document.getElementById('ai-advisor-content');
-            
-            contentDiv.innerHTML = `
-                <div class="text-center py-12 flex flex-col items-center justify-center">
-                    <i class="fa-solid fa-wand-magic-sparkles fa-bounce text-4xl text-brand-500 mb-4"></i>
-                    <h4 class="font-bold text-slate-800 dark:text-slate-100">FinAI is crunching the numbers...</h4>
-                    <p class="text-xs text-slate-500 mt-2">Analyzing your financial patterns.</p>
-                </div>
-            `;
-            
-            const currentTxns = getCurrentTransactions();
-            const accountName = appData.accounts.find(a => a.id === appData.currentAccountId)?.name || 'Account';
-            const sym = getCurrencySymbol();
-            
-            const summaryData = {
-                account: accountName,
-                currency: sym,
-                balance: document.getElementById('balance').innerText,
-                recentTransactions: currentTxns.slice(0, 15).map(t => ({
-                    date: t.date, text: t.text, amount: t.amount, category: t.category
-                })),
-                goals: appData.goals.filter(g => g.accountId === appData.currentAccountId).map(g => ({
-                    name: g.name, target: g.target, saved: g.saved
-                })),
-                budgets: appData.budgets.filter(b => b.accountId === appData.currentAccountId).map(b => {
-                    const spent = currentTxns.filter(t => t.category === b.category && t.date.startsWith(new Date().toISOString().slice(0,7))).reduce((acc, t) => acc + Math.abs(t.amount), 0);
-                    return { category: b.category, limit: b.limit, spent: spent };
-                })
-            };
-
-            const systemPrompt = `You are FinAI, a world-class, witty financial advisor. Analyze the user financial JSON. Write a concise 3-paragraph report addressing spending, budgets, and savings goals. Format entirely in valid HTML snippets with Tailwind classes. No Markdown fences.`;
-            
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: JSON.stringify(summaryData) }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
-            
-            const apiKey = "";
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-            
-            try {
-                const res = await fetchWithRetry(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                
-                if (data.candidates && data.candidates.length > 0) {
-                    let htmlContent = data.candidates[0].content.parts[0].text;
-                    htmlContent = htmlContent.replace(/```html\n?/g, '').replace(/```/g, '');
-                    contentDiv.innerHTML = htmlContent;
-                }
-            } catch (e) {
-                console.error(e);
-                contentDiv.innerHTML = `
-                    <div class="text-center py-10 bg-rose-50 dark:bg-rose-900/20 rounded-2xl border border-rose-100 dark:border-rose-800">
-                        <i class="fa-solid fa-triangle-exclamation text-2xl text-rose-500 mb-2"></i>
-                        <p class="font-bold text-rose-600 dark:text-rose-400">Oops! FinAI Connection Failed</p>
-                        <p class="text-xs text-rose-500 mt-1">Please try again later.</p>
-                    </div>`;
+            if (finAiChatHistory.length === 0) {
+                document.getElementById('chat-messages').innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center py-10 opacity-70">
+                        <i class="fa-solid fa-wand-magic-sparkles text-4xl text-brand-500 mb-4 fa-bounce"></i>
+                        <p class="font-bold text-slate-700 dark:text-slate-300">Hi! I'm FinAI.</p>
+                        <p class="text-xs text-slate-500 mt-1">Ask me anything about your finances, budgets, or goals.</p>
+                    </div>
+                `;
             }
         }
 
-        async function predictCashFlow() {
-            const contentDiv = document.getElementById('ai-advisor-content');
-            contentDiv.innerHTML = `
-                <div class="text-center py-12 flex flex-col items-center justify-center">
-                    <i class="fa-solid fa-chart-line fa-fade text-4xl text-brand-500 mb-4"></i>
-                    <h4 class="font-bold text-slate-800 dark:text-slate-100">FinAI is predicting future trends...</h4>
-                    <p class="text-xs text-slate-500 mt-2">Analyzing your spending velocity.</p>
+        function appendChatMessage(role, text) {
+            const chatMessages = document.getElementById('chat-messages');
+            const emptyState = chatMessages.querySelector('.flex-col.items-center');
+            if (emptyState) emptyState.remove();
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} w-full`;
+            
+            let formattedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            msgDiv.innerHTML = `
+                <div class="max-w-[85%] rounded-2xl px-4 py-3 ${
+                    role === 'user' 
+                    ? 'bg-brand-600 text-white rounded-br-sm shadow-md shadow-brand-200 dark:shadow-none' 
+                    : 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-bl-sm shadow-sm'
+                }">
+                    <p class="text-[13px] sm:text-sm leading-relaxed">${formattedText}</p>
                 </div>
             `;
-            
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendChatMessage(overrideText = null) {
+            const inputEl = document.getElementById('chat-input');
+            const text = overrideText || inputEl.value.trim();
+            if (!text) return;
+
+            if (inputEl) inputEl.value = '';
+            appendChatMessage('user', text);
+            finAiChatHistory.push({ role: 'user', parts: [{ text: text }] });
+
+            const loadingId = 'loading-' + Date.now();
+            const chatMessages = document.getElementById('chat-messages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = loadingId;
+            loadingDiv.className = `flex justify-start w-full`;
+            loadingDiv.innerHTML = `
+                <div class="max-w-[85%] rounded-2xl px-4 py-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-bl-sm shadow-sm flex items-center gap-1.5">
+                    <div class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                    <div class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+            `;
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
             const currentTxns = getCurrentTransactions();
             const accountName = appData.accounts.find(a => a.id === appData.currentAccountId)?.name || 'Account';
             const sym = getCurrencySymbol();
@@ -922,22 +697,28 @@
                 recentTransactions: currentTxns.slice(0, 30).map(t => ({
                     date: t.date, text: t.text, amount: t.amount, category: t.category, tags: t.tags
                 })),
+                goals: appData.goals.filter(g => g.accountId === appData.currentAccountId).map(g => ({
+                    name: g.name, target: g.target, saved: g.saved
+                })),
                 budgets: appData.budgets.filter(b => b.accountId === appData.currentAccountId).map(b => {
                     const spent = currentTxns.filter(t => t.category === b.category && t.date.startsWith(new Date().toISOString().slice(0,7))).reduce((acc, t) => acc + Math.abs(t.amount), 0);
                     return { category: b.category, limit: b.limit, spent: spent };
                 })
             };
 
-            const systemPrompt = `You are FinAI, a predictive financial advisor. Forecast the rest of the month and warn if budgets will be exceeded. Format in raw HTML with Tailwind classes. No Markdown fences.`;
-            
+            const systemPrompt = `You are FinAI, a helpful, witty, and concise financial advisor chatbot built into the FinTrack app. 
+You have access to the user's financial data JSON. Keep your answers brief (1-3 paragraphs max) unless asked for a detailed breakdown. 
+Format your responses using HTML for bold (**text** becomes bold automatically, so use standard markdown bold) or lists if necessary, but keep it clean. Do not use markdown blocks like \`\`\`html.
+User Context Data: ${JSON.stringify(summaryData)}`;
+
             const payload = {
-                contents: [{ role: "user", parts: [{ text: JSON.stringify(summaryData) }] }],
+                contents: finAiChatHistory,
                 systemInstruction: { parts: [{ text: systemPrompt }] }
             };
-            
+
             const apiKey = "";
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-            
+
             try {
                 const res = await fetchWithRetry(url, {
                     method: 'POST',
@@ -946,19 +727,103 @@
                 });
                 const data = await res.json();
                 
+                document.getElementById(loadingId).remove();
+
                 if (data.candidates && data.candidates.length > 0) {
-                    let htmlContent = data.candidates[0].content.parts[0].text;
-                    htmlContent = htmlContent.replace(/```html\n?/g, '').replace(/```/g, '');
-                    contentDiv.innerHTML = htmlContent;
+                    const replyText = data.candidates[0].content.parts[0].text;
+                    appendChatMessage('model', replyText);
+                    finAiChatHistory.push({ role: 'model', parts: [{ text: replyText }] });
+                } else {
+                    appendChatMessage('model', "I'm having trouble thinking right now. Could you try asking again?");
                 }
             } catch (e) {
                 console.error(e);
-                contentDiv.innerHTML = `
-                    <div class="text-center py-10 bg-rose-50 dark:bg-rose-900/20 rounded-2xl border border-rose-100 dark:border-rose-800">
-                        <i class="fa-solid fa-triangle-exclamation text-2xl text-rose-500 mb-2"></i>
-                        <p class="font-bold text-rose-600 dark:text-rose-400">FinAI Prediction Failed</p>
-                    </div>`;
+                document.getElementById(loadingId).remove();
+                appendChatMessage('model', "Oops, connection to my brain failed. Please check your network and try again.");
             }
+        }
+
+        async function handleReceiptUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64Data = e.target.result.split(',')[1];
+                const mimeType = file.type;
+
+                document.getElementById('ai-loading-overlay').classList.remove('hidden');
+                document.getElementById('ai-loading-overlay').classList.add('flex');
+                document.getElementById('ai-loading-text').innerText = "Scanning receipt...";
+
+                const prompt = `Analyze this receipt. Extract the merchant name, total amount, and suggest a category and some tags. 
+                Categories must be one of: 'Food & Drinks', 'Transport', 'Shopping', 'Bills'. If it doesn't fit, suggest a new category name.
+                Return ONLY a valid JSON object with no formatting or backticks.
+                Format exactly like this:
+                {"merchant": "Starbucks", "amount": 12.34, "category": "Food & Drinks", "tags": ["coffee", "morning"]}`;
+
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [
+                            { text: prompt },
+                            { inlineData: { mimeType: mimeType, data: base64Data } }
+                        ]
+                    }],
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
+                };
+
+                const apiKey = "";
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                try {
+                    const res = await fetchWithRetry(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await res.json();
+                    
+                    if (result.candidates && result.candidates.length > 0) {
+                        const jsonText = result.candidates[0].content.parts[0].text;
+                        const data = JSON.parse(jsonText);
+                        
+                        document.getElementById('text').value = data.merchant || '';
+                        document.getElementById('amount').value = data.amount || '';
+                        if (data.tags && Array.isArray(data.tags)) {
+                            document.getElementById('tags').value = data.tags.join(', ');
+                        }
+                        
+                        if (data.category) {
+                            const selectEl = document.getElementById('category');
+                            const options = Array.from(selectEl.options).map(o => o.value);
+                            if (options.includes(data.category)) {
+                                selectEl.value = data.category;
+                            } else {
+                                if (!appData.customCategories.some(c => c.name.toLowerCase() === data.category.toLowerCase())) {
+                                    appData.customCategories.push({ name: data.category, type: 'debit' });
+                                    updateLocalStorage();
+                                    renderCategoryOptions();
+                                }
+                                selectEl.value = data.category;
+                            }
+                            handleCategoryChange(); 
+                        }
+                        
+                        showToast("Receipt scanned successfully!", 'success');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast("Failed to parse receipt. Please try a clearer image.", "error");
+                } finally {
+                    document.getElementById('ai-loading-overlay').classList.add('hidden');
+                    document.getElementById('ai-loading-overlay').classList.remove('flex');
+                    event.target.value = ''; 
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         function closeAIAdvisor() {
@@ -1052,7 +917,7 @@
                 const option = document.createElement('option');
                 option.value = account.id;
                 option.innerText = account.name;
-                option.className = "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100";
+                option.className = "bg-white dark:bg-slate-800 text-slate-800 dark:text-white font-semibold";
                 if (account.id === appData.currentAccountId) {
                     option.selected = true;
                 }
@@ -1062,20 +927,20 @@
             const sepOption = document.createElement('option');
             sepOption.disabled = true;
             sepOption.innerText = '──────────';
-            sepOption.className = "bg-slate-100 dark:bg-slate-800 text-slate-400";
+            sepOption.className = "bg-white dark:bg-slate-800 text-slate-400";
             accountSelectorEl.appendChild(sepOption);
 
             const addOpt = document.createElement('option');
             addOpt.value = '__ADD_ACCOUNT__';
             addOpt.innerText = '+ Add Account';
-            addOpt.className = "bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 font-bold";
+            addOpt.className = "bg-slate-50 dark:bg-slate-900 text-brand-600 dark:text-brand-400 font-bold";
             accountSelectorEl.appendChild(addOpt);
 
             if (appData.accounts.length > 1) {
                 const delOpt = document.createElement('option');
                 delOpt.value = '__DEL_ACCOUNT__';
                 delOpt.innerText = '🗑️ Delete Current Account';
-                delOpt.className = "bg-slate-100 dark:bg-slate-800 text-rose-500 font-bold";
+                delOpt.className = "bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-bold";
                 accountSelectorEl.appendChild(delOpt);
             }
         }
