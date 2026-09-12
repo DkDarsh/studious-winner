@@ -10,6 +10,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Added Tesseract for local, offline receipt scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -192,18 +196,19 @@
             
             <div id="ai-loading-overlay" class="absolute inset-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm z-10 hidden flex-col items-center justify-center rounded-3xl">
                 <i class="fa-solid fa-wand-magic-sparkles fa-bounce text-4xl text-brand-500 mb-3"></i>
-                <p class="text-sm font-bold text-slate-800 dark:text-slate-100" id="ai-loading-text">Analyzing with FinAI...</p>
+                <p class="text-sm font-bold text-slate-800 dark:text-slate-100" id="ai-loading-text">Scanning receipt locally...</p>
             </div>
 
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <h3 id="transaction-modal-title" class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-plus-circle text-brand-500"></i> New Transaction
                 </h3>
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="document.getElementById('receipt-upload').click()" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm border border-brand-100 dark:border-brand-800" title="Scan Receipt with AI">
-                        <i class="fa-solid fa-camera"></i> <span class="hidden sm:inline">Scan Receipt</span>
+                    <button type="button" onclick="document.getElementById('receipt-upload').click()" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm border border-brand-100 dark:border-brand-800" title="Scan or Upload File">
+                        <i class="fa-solid fa-camera"></i> <span class="hidden sm:inline">Scan or Upload File</span>
                     </button>
-                    <input type="file" id="receipt-upload" accept="image/*" class="hidden" onchange="handleReceiptUpload(event)">
+                    <!-- Removed accept="image/*" to allow ALL files -->
+                    <input type="file" id="receipt-upload" class="hidden" onchange="handleReceiptUpload(event)">
                     <button type="button" onclick="closeAddTransactionModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-all focus:outline-none ml-1">
                         <i class="fa-solid fa-xmark text-sm"></i>
                     </button>
@@ -211,6 +216,7 @@
             </div>
             
             <form id="form" class="flex flex-col gap-4">
+                <input type="hidden" id="edit-transaction-id" value="">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type & Category</label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -253,10 +259,36 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full mt-2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none flex justify-center items-center gap-2 active:scale-95 text-sm">
+                <button type="submit" id="transaction-submit-btn" class="w-full mt-2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none flex justify-center items-center gap-2 active:scale-95 text-sm">
                     <i class="fa-solid fa-paper-plane"></i> Save Transaction
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- View Transaction Details Modal -->
+    <div id="view-transaction-modal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-receipt text-brand-500"></i> Transaction Details
+                </h3>
+                <button onclick="closeViewTransactionModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-all focus:outline-none">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            
+            <div id="view-transaction-content" class="space-y-3 mb-6 text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+            </div>
+
+            <div class="flex gap-2">
+                <button id="view-modal-edit-btn" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-pen"></i> Edit
+                </button>
+                <button id="view-modal-delete-btn" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </button>
+            </div>
         </div>
     </div>
 
@@ -273,7 +305,6 @@
             
             <p class="text-xs text-slate-500 mb-2 font-semibold">Active Currency for New Transactions</p>
             <select id="currency-select" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm shadow-sm mb-4">
-                <!-- Dynamically populated -->
             </select>
             <button onclick="saveCurrency()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none flex justify-center items-center text-sm mb-4">
                 Set as Active
@@ -297,6 +328,7 @@
         </div>
     </div>
 
+    <!-- Savings Goals Modal -->
     <div id="goals-modal" class="fixed inset-0 z-[55] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center mb-4">
@@ -318,11 +350,10 @@
 
             <div id="add-goal-form-container" class="hidden flex flex-col">
                 <form id="new-goal-form" onsubmit="saveNewGoal(event)" class="flex flex-col gap-3">
+                    <input type="hidden" id="edit-goal-id" value="">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Goal Name (e.g. Eras Tour)</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="goal-name" placeholder="What are you saving for?" required class="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
-                        </div>
+                        <input type="text" id="goal-name" placeholder="What are you saving for?" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Target Amount</label>
@@ -333,13 +364,14 @@
                     </div>
                     <div class="flex gap-2 mt-2">
                         <button type="button" onclick="hideAddGoalForm()" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-bold py-3 rounded-xl transition-all text-sm">Cancel</button>
-                        <button type="submit" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none text-sm">Start Saving</button>
+                        <button type="submit" id="goal-submit-btn" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none text-sm">Start Saving</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Allocate Funds Modal -->
     <div id="add-funds-modal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-xs w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col text-center">
             <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Allocate Funds</h3>
@@ -421,6 +453,7 @@
         </div>
     </div>
 
+    <!-- Monthly Budgets Modal -->
     <div id="budgets-modal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center mb-4">
@@ -443,6 +476,7 @@
 
             <div id="add-budget-form-container" class="hidden flex flex-col">
                 <form id="new-budget-form" onsubmit="saveNewBudget(event)" class="flex flex-col gap-3">
+                    <input type="hidden" id="edit-budget-id" value="">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Select Category</label>
                         <select id="budget-category" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm appearance-none">
@@ -457,7 +491,7 @@
                     </div>
                     <div class="flex gap-2 mt-2">
                         <button type="button" onclick="hideAddBudgetForm()" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-bold py-3 rounded-xl transition-all text-sm">Cancel</button>
-                        <button type="submit" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none text-sm">Save Budget</button>
+                        <button type="submit" id="budget-submit-btn" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-brand-200 dark:shadow-none text-sm">Save Budget</button>
                     </div>
                 </form>
             </div>
@@ -505,6 +539,7 @@
         </div>
     </div>
 
+    <!-- FinAI Advisor Modal -->
     <div id="ai-advisor-modal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 animate-slide-in flex flex-col h-[85vh] max-h-[700px]">
             <div class="flex justify-between items-center mb-4 shrink-0">
@@ -519,7 +554,6 @@
             </div>
             
             <div id="chat-messages" class="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 rounded-2xl p-4 space-y-4 mb-4 border border-slate-100 dark:border-slate-700/50">
-                <!-- Messages -->
             </div>
 
             <div class="flex gap-2 shrink-0 mb-2 overflow-x-auto pb-1" id="chat-quick-actions">
@@ -539,7 +573,6 @@
 
     <div id="wrapped-modal" class="fixed inset-0 z-[100] bg-slate-900 hidden flex items-center justify-center p-4 backdrop-blur-md">
         <div id="wrapped-content" class="w-full max-w-sm aspect-[9/16] bg-gradient-to-br from-brand-600 via-pink-600 to-rose-500 rounded-3xl shadow-2xl overflow-hidden relative text-white flex flex-col justify-center items-center text-center p-6 cursor-pointer transform transition-all duration-300" onclick="nextWrappedSlide()">
-            <!-- Slides injected here -->
         </div>
         <button onclick="closeWrapped()" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-white/30 transition-all backdrop-blur-md z-10">
             <i class="fa-solid fa-xmark"></i>
@@ -596,7 +629,6 @@
         const healthPercentageEl = document.getElementById('health-percentage');
         
         const htmlElement = document.documentElement;
-        const themeIcon = document.getElementById('theme-icon');
         const menuThemeIcon = document.getElementById('menu-theme-icon');
         const menuThemeText = document.getElementById('menu-theme-text');
         const accountSelectorEl = document.getElementById('account-selector');
@@ -605,25 +637,6 @@
         const newAccountNameInput = document.getElementById('new-account-name');
 
         let insightsChartInstance = null;
-
-        async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
-            try {
-                const res = await fetch(url, options);
-                if (!res.ok && res.status === 429 && retries > 0) {
-                    await new Promise(r => setTimeout(r, delay));
-                    return fetchWithRetry(url, options, retries - 1, delay * 2);
-                }
-                if (!res.ok) throw new Error(`API Error: ${res.status}`);
-                return res;
-            } catch(e) {
-                if (retries > 0) {
-                    await new Promise(r => setTimeout(r, delay));
-                    return fetchWithRetry(url, options, retries - 1, delay * 2);
-                }
-                throw e;
-            }
-        }
-
         let finAiChatHistory = [];
 
         function openAIAdvisor() {
@@ -633,7 +646,7 @@
                     <div class="flex flex-col items-center justify-center h-full text-center py-10 opacity-70">
                         <i class="fa-solid fa-wand-magic-sparkles text-4xl text-brand-500 mb-4 fa-bounce"></i>
                         <p class="font-bold text-slate-700 dark:text-slate-300">Hi! I'm FinAI.</p>
-                        <p class="text-xs text-slate-500 mt-1">Ask me anything about your finances, budgets, or goals.</p>
+                        <p class="text-xs text-slate-500 mt-1">Ask me anything about your finances. I run completely offline!</p>
                     </div>
                 `;
             }
@@ -686,144 +699,121 @@
             chatMessages.appendChild(loadingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            const currentTxns = getCurrentTransactions();
-            const accountName = appData.accounts.find(a => a.id === appData.currentAccountId)?.name || 'Account';
-            const sym = getCurrencySymbol();
-            
-            const summaryData = {
-                account: accountName,
-                currency: sym,
-                balance: document.getElementById('balance').innerText,
-                recentTransactions: currentTxns.slice(0, 30).map(t => ({
-                    date: t.date, text: t.text, amount: t.amount, category: t.category, tags: t.tags
-                })),
-                goals: appData.goals.filter(g => g.accountId === appData.currentAccountId).map(g => ({
-                    name: g.name, target: g.target, saved: g.saved
-                })),
-                budgets: appData.budgets.filter(b => b.accountId === appData.currentAccountId).map(b => {
-                    const spent = currentTxns.filter(t => t.category === b.category && t.date.startsWith(new Date().toISOString().slice(0,7))).reduce((acc, t) => acc + Math.abs(t.amount), 0);
-                    return { category: b.category, limit: b.limit, spent: spent };
-                })
-            };
+            setTimeout(() => {
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
 
-            const systemPrompt = `You are FinAI, a helpful, witty, and concise financial advisor chatbot built into the FinTrack app. 
-You have access to the user's financial data JSON. Keep your answers brief (1-3 paragraphs max) unless asked for a detailed breakdown. 
-Format your responses using HTML for bold (**text** becomes bold automatically, so use standard markdown bold) or lists if necessary, but keep it clean. Do not use markdown blocks like \`\`\`html.
-User Context Data: ${JSON.stringify(summaryData)}`;
-
-            const payload = {
-                contents: finAiChatHistory,
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
-
-            const apiKey = "";
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            try {
-                const res = await fetchWithRetry(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
+                const lowerText = text.toLowerCase();
+                let replyText = "I'm your offline FinAI! I can help summarize your spending, predict trends, or find ways to save. Try asking 'summary'.";
                 
-                document.getElementById(loadingId).remove();
+                const currentTxns = getCurrentTransactions();
+                const sym = getCurrencySymbol();
+                const balance = document.getElementById('balance').innerText;
 
-                if (data.candidates && data.candidates.length > 0) {
-                    const replyText = data.candidates[0].content.parts[0].text;
-                    appendChatMessage('model', replyText);
-                    finAiChatHistory.push({ role: 'model', parts: [{ text: replyText }] });
-                } else {
-                    appendChatMessage('model', "I'm having trouble thinking right now. Could you try asking again?");
+                if (lowerText.includes('summary')) {
+                    replyText = `**Here's your summary:**<br>Your current balance is ${sym}${balance}. You have ${currentTxns.length} transactions recorded on this account.`;
+                } else if (lowerText.includes('predict') || lowerText.includes('trend') || lowerText.includes('cash flow')) {
+                    replyText = "Based on local data, if you continue spending at your current rate, make sure to monitor your **Food & Drinks** and **Shopping** categories as they usually account for the most spontaneous expenses!";
+                } else if (lowerText.includes('cut') || lowerText.includes('save') || lowerText.includes('where')) {
+                    replyText = "To cut back on spending, try setting strict **Budgets** for discretionary categories like Shopping and Food. Also, consider adding any spare change to your **Savings Goals**!";
+                } else if (lowerText.includes('hello') || lowerText.includes('hi')) {
+                    replyText = "Hello there! How can I help you manage your finances today completely offline?";
                 }
-            } catch (e) {
-                console.error(e);
-                document.getElementById(loadingId).remove();
-                appendChatMessage('model', "Oops, connection to my brain failed. Please check your network and try again.");
-            }
+
+                appendChatMessage('model', replyText);
+                finAiChatHistory.push({ role: 'model', parts: [{ text: replyText }] });
+            }, 800); 
         }
 
         async function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const base64Data = e.target.result.split(',')[1];
-                const mimeType = file.type;
+            document.getElementById('ai-loading-overlay').classList.remove('hidden');
+            document.getElementById('ai-loading-overlay').classList.add('flex');
+            document.getElementById('ai-loading-text').innerText = "Scanning file locally...";
 
-                document.getElementById('ai-loading-overlay').classList.remove('hidden');
-                document.getElementById('ai-loading-overlay').classList.add('flex');
-                document.getElementById('ai-loading-text').innerText = "Scanning receipt...";
+            try {
+                let extractedText = "";
 
-                const prompt = `Analyze this receipt. Extract the merchant name, total amount, and suggest a category and some tags. 
-                Categories must be one of: 'Food & Drinks', 'Transport', 'Shopping', 'Bills'. If it doesn't fit, suggest a new category name.
-                Return ONLY a valid JSON object with no formatting or backticks.
-                Format exactly like this:
-                {"merchant": "Starbucks", "amount": 12.34, "category": "Food & Drinks", "tags": ["coffee", "morning"]}`;
-
-                const payload = {
-                    contents: [{
-                        role: "user",
-                        parts: [
-                            { text: prompt },
-                            { inlineData: { mimeType: mimeType, data: base64Data } }
-                        ]
-                    }],
-                    generationConfig: {
-                        responseMimeType: "application/json"
-                    }
-                };
-
-                const apiKey = "";
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-                try {
-                    const res = await fetchWithRetry(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                // Handle Text/CSV/JSON files directly
+                if (file.type.startsWith('text/') || file.name.match(/\.(csv|txt|json|log)$/i)) {
+                    extractedText = await file.text();
+                } 
+                // Handle Image files via Tesseract
+                else if (file.type.startsWith('image/')) {
+                    const img = new Image();
+                    img.src = URL.createObjectURL(file);
+                    await new Promise((res, rej) => {
+                        img.onload = res;
+                        img.onerror = () => rej(new Error("Corrupted or unreadable image file."));
                     });
-                    const result = await res.json();
+
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
                     
-                    if (result.candidates && result.candidates.length > 0) {
-                        const jsonText = result.candidates[0].content.parts[0].text;
-                        const data = JSON.parse(jsonText);
-                        
-                        document.getElementById('text').value = data.merchant || '';
-                        document.getElementById('amount').value = data.amount || '';
-                        if (data.tags && Array.isArray(data.tags)) {
-                            document.getElementById('tags').value = data.tags.join(', ');
+                    const MAX_WIDTH = 1024;
+                    const MAX_HEIGHT = 1024;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
                         }
-                        
-                        if (data.category) {
-                            const selectEl = document.getElementById('category');
-                            const options = Array.from(selectEl.options).map(o => o.value);
-                            if (options.includes(data.category)) {
-                                selectEl.value = data.category;
-                            } else {
-                                if (!appData.customCategories.some(c => c.name.toLowerCase() === data.category.toLowerCase())) {
-                                    appData.customCategories.push({ name: data.category, type: 'debit' });
-                                    updateLocalStorage();
-                                    renderCategoryOptions();
-                                }
-                                selectEl.value = data.category;
-                            }
-                            handleCategoryChange(); 
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
                         }
-                        
-                        showToast("Receipt scanned successfully!", 'success');
                     }
-                } catch (err) {
-                    console.error(err);
-                    showToast("Failed to parse receipt. Please try a clearer image.", "error");
-                } finally {
-                    document.getElementById('ai-loading-overlay').classList.add('hidden');
-                    document.getElementById('ai-loading-overlay').classList.remove('flex');
-                    event.target.value = ''; 
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    if (typeof Tesseract === 'undefined') {
+                        throw new Error("Tesseract library not loaded. Check network connection.");
+                    }
+                    
+                    const worker = await Tesseract.createWorker('eng');
+                    const ret = await worker.recognize(canvas);
+                    extractedText = ret.data.text;
+                    await worker.terminate();
+                } 
+                // Handle PDF or general files via FileReader text extraction attempt
+                else {
+                    extractedText = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result || "");
+                        reader.onerror = () => resolve("");
+                        reader.readAsText(file);
+                    });
+                    if (!extractedText) {
+                        extractedText = file.name;
+                    }
                 }
-            };
-            reader.readAsDataURL(file);
+
+                let fileName = file.name.split('.')[0] || "Uploaded File";
+                document.getElementById('text').value = fileName.charAt(0).toUpperCase() + fileName.slice(1);
+                
+                const amountMatch = extractedText.match(/[\$\£\€\₹]?\s*(\d+\.\d{2})/);
+                if (amountMatch) {
+                    document.getElementById('amount').value = amountMatch[1];
+                }
+                
+                document.getElementById('category').value = 'Shopping'; 
+                handleCategoryChange();
+                showToast("File processed successfully!", 'success');
+
+            } catch (err) {
+                showToast(err.message || "Failed to parse file. Please try again.", "error");
+            } finally {
+                document.getElementById('ai-loading-overlay').classList.add('hidden');
+                document.getElementById('ai-loading-overlay').classList.remove('flex');
+                event.target.value = ''; 
+            }
         }
 
         function closeAIAdvisor() {
@@ -948,7 +938,7 @@ User Context Data: ${JSON.stringify(summaryData)}`;
         function handleAccountChange(event) {
             const val = event.target.value;
             if (val === '__ADD_ACCOUNT__') {
-                renderAccountSelector(); // reset dropdown selection temporarily
+                renderAccountSelector();
                 openAddAccountModal();
             } else if (val === '__DEL_ACCOUNT__') {
                 renderAccountSelector();
@@ -974,13 +964,85 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             newAccountNameInput.value = '';
         }
 
-        function openAddTransactionModal() {
-            document.getElementById('add-transaction-modal').classList.remove('hidden');
-            setDefaultLocalDate();
+        function openAddTransactionModal(editId = null) {
+            const modal = document.getElementById('add-transaction-modal');
+            const titleEl = document.getElementById('transaction-modal-title');
+            const submitBtn = document.getElementById('transaction-submit-btn');
+            
+            if (editId) {
+                const txn = appData.transactions.find(t => t.id === editId);
+                if (!txn) return;
+                
+                titleEl.innerHTML = `<i class="fa-solid fa-pen text-brand-500"></i> Edit Transaction`;
+                submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> Update Transaction`;
+                
+                document.getElementById('edit-transaction-id').value = txn.id;
+                typeEl.value = txn.amount > 0 ? 'credit' : 'debit';
+                categoryEl.value = txn.category;
+                textEl.value = txn.text;
+                amountEl.value = Math.abs(txn.amount);
+                document.getElementById('tags').value = txn.tags ? txn.tags.join(', ') : '';
+                dateEl.value = txn.date;
+            } else {
+                titleEl.innerHTML = `<i class="fa-solid fa-plus-circle text-brand-500"></i> New Transaction`;
+                submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Save Transaction`;
+                
+                document.getElementById('edit-transaction-id').value = '';
+                formEl.reset();
+                setDefaultLocalDate();
+            }
+            modal.classList.remove('hidden');
         }
 
         function closeAddTransactionModal() {
             document.getElementById('add-transaction-modal').classList.add('hidden');
+        }
+
+        function viewTransaction(id) {
+            const txn = appData.transactions.find(t => t.id === id);
+            if (!txn) return;
+            
+            const sym = txn.currencySymbol || getCurrencySymbol(txn.currencyCode);
+            const isCredit = txn.amount > 0;
+            const contentEl = document.getElementById('view-transaction-content');
+            
+            contentEl.innerHTML = `
+                <div class="flex justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+                    <span class="font-semibold text-slate-400">Description</span>
+                    <span class="font-bold">${txn.text}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+                    <span class="font-semibold text-slate-400">Amount</span>
+                    <span class="font-bold ${isCredit ? 'text-emerald-500' : 'text-rose-500'}">${isCredit ? '+' : '-'}${sym}${formatRupees(Math.abs(txn.amount))}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+                    <span class="font-semibold text-slate-400">Category</span>
+                    <span class="font-bold uppercase">${txn.category}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+                    <span class="font-semibold text-slate-400">Date</span>
+                    <span class="font-bold">${formatDate(txn.date)}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-slate-400">Tags</span>
+                    <span class="font-bold">${txn.tags && txn.tags.length > 0 ? txn.tags.map(t => '#'+t).join(', ') : 'None'}</span>
+                </div>
+            `;
+            
+            document.getElementById('view-modal-edit-btn').onclick = () => {
+                closeViewTransactionModal();
+                openAddTransactionModal(txn.id);
+            };
+            document.getElementById('view-modal-delete-btn').onclick = () => {
+                closeViewTransactionModal();
+                removeTransaction(txn.id);
+            };
+
+            document.getElementById('view-transaction-modal').classList.remove('hidden');
+        }
+
+        function closeViewTransactionModal() {
+            document.getElementById('view-transaction-modal').classList.add('hidden');
         }
 
         function getCurrentTransactions() {
@@ -1032,6 +1094,7 @@ User Context Data: ${JSON.stringify(summaryData)}`;
         function addTransaction(e) {
             e.preventDefault();
 
+            const editId = document.getElementById('edit-transaction-id').value;
             const text = textEl.value.trim();
             const amountValue = amountEl.value.trim();
             const type = typeEl.value;
@@ -1056,36 +1119,40 @@ User Context Data: ${JSON.stringify(summaryData)}`;
 
             const currentCurrCode = appData.settings.currency || 'INR';
 
-            const transaction = {
-                id: Math.floor(Math.random() * 100000000),
-                accountId: appData.currentAccountId,
-                text: text,
-                amount: type === 'debit' ? -Math.abs(amount) : Math.abs(amount),
-                category: category,
-                date: customDate ? customDate : new Date().toISOString().split('T')[0],
-                tags: tags,
-                currencyCode: currentCurrCode,
-                currencySymbol: getCurrencySymbol(currentCurrCode)
-            };
+            if (editId) {
+                const txn = appData.transactions.find(t => t.id == editId);
+                if (txn) {
+                    txn.text = text;
+                    txn.amount = type === 'debit' ? -Math.abs(amount) : Math.abs(amount);
+                    txn.category = category;
+                    txn.date = customDate ? customDate : txn.date;
+                    txn.tags = tags;
+                }
+                showToast("Transaction updated successfully!", 'success');
+            } else {
+                const transaction = {
+                    id: Math.floor(Math.random() * 100000000),
+                    accountId: appData.currentAccountId,
+                    text: text,
+                    amount: type === 'debit' ? -Math.abs(amount) : Math.abs(amount),
+                    category: category,
+                    date: customDate ? customDate : new Date().toISOString().split('T')[0],
+                    tags: tags,
+                    currencyCode: currentCurrCode,
+                    currencySymbol: getCurrencySymbol(currentCurrCode)
+                };
+                appData.transactions.push(transaction);
+                const quirkyMsg = getQuirkyMessage(type, category, amount);
+                showToast(quirkyMsg, 'success');
+            }
 
-            appData.transactions.push(transaction);
             updateLocalStorage();
-            
             init();
-
-            const quirkyMsg = getQuirkyMessage(type, category, amount);
-            showToast(quirkyMsg, 'success');
-
-            textEl.value = '';
-            amountEl.value = '';
-            document.getElementById('tags').value = '';
-            setDefaultLocalDate();
             closeAddTransactionModal();
         }
 
         function showToast(message, type = 'error') {
             toastTextEl.innerText = message;
-            
             toastMsgEl.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] text-xs font-bold p-3 sm:px-4 sm:py-3 rounded-xl shadow-lg flex items-center gap-2 animate-slide-in';
             toastIconEl.className = '';
             
@@ -1138,8 +1205,12 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             item.classList.add(
                 'animate-slide-in', 'bg-white', 'dark:bg-slate-800', 'rounded-2xl', 'p-4', 'sm:p-5', 
                 'flex', 'justify-between', 'items-center', 'shadow-sm', 'border', 
-                'border-slate-100', 'dark:border-slate-700/50', 'group', 'gap-2'
+                'border-slate-100', 'dark:border-slate-700/50', 'group', 'gap-2', 'cursor-pointer', 'hover:border-brand-500/50', 'transition-all'
             );
+            item.onclick = (e) => {
+                if(e.target.closest('button')) return;
+                viewTransaction(transaction.id);
+            };
 
             const amountColorClass = isCredit ? 'text-emerald-500' : 'text-rose-500 dark:text-rose-400';
 
@@ -1154,12 +1225,15 @@ User Context Data: ${JSON.stringify(summaryData)}`;
                         ${tagsHTML}
                     </div>
                 </div>
-                <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
                     <span class="font-bold tracking-tight text-[15px] sm:text-base ${amountColorClass}">
                         ${sign}${txSymbol}${formatRupees(Math.abs(transaction.amount))}
                     </span>
-                    <button onclick="removeTransaction(${transaction.id})" class="w-10 h-10 flex justify-center items-center text-slate-300 hover:text-rose-500 dark:text-slate-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-full transition-all focus:outline-none shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100">
-                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    <button onclick="openAddTransactionModal(${transaction.id})" class="w-9 h-9 flex justify-center items-center text-slate-300 hover:text-brand-500 dark:text-slate-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-slate-700 rounded-full transition-all focus:outline-none" title="Edit">
+                        <i class="fa-solid fa-pen text-xs"></i>
+                    </button>
+                    <button onclick="removeTransaction(${transaction.id})" class="w-9 h-9 flex justify-center items-center text-slate-300 hover:text-rose-500 dark:text-slate-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-full transition-all focus:outline-none" title="Delete">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
                     </button>
                 </div>
             `;
@@ -1236,8 +1310,8 @@ User Context Data: ${JSON.stringify(summaryData)}`;
         }
 
         function promptDeleteAccount() {
-            if (appData.accounts.length <= 1) {
-                showToast("You cannot delete your only account.", "error");
+            if (appData.accounts.length <= 1 || appData.currentAccountId === DEFAULT_ACCOUNT_ID) {
+                showToast("You cannot delete the Main Account.", "error");
                 return;
             }
             
@@ -1249,7 +1323,7 @@ User Context Data: ${JSON.stringify(summaryData)}`;
                 () => {
                     appData.transactions = appData.transactions.filter(t => t.accountId !== appData.currentAccountId);
                     appData.accounts = appData.accounts.filter(a => a.id !== appData.currentAccountId);
-                    appData.currentAccountId = appData.accounts[0].id;
+                    appData.currentAccountId = DEFAULT_ACCOUNT_ID;
                     
                     updateLocalStorage();
                     init();
@@ -1301,7 +1375,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
 
         function renderChart() {
             const ctx = document.getElementById('insightsChart').getContext('2d');
-            
             const expenseData = {};
             let totalExpenses = 0;
             let topCategory = '-';
@@ -1311,7 +1384,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             currentTxns.filter(t => t.amount < 0).forEach(t => {
                 const amount = Math.abs(t.amount);
                 totalExpenses += amount;
-                
                 if (expenseData[t.category]) {
                     expenseData[t.category] += amount;
                 } else {
@@ -1466,10 +1538,8 @@ User Context Data: ${JSON.stringify(summaryData)}`;
         function openShareSheet() {
             const summary = generateFinancialSummaryText();
             document.getElementById('sheet-preview-text').innerText = summary;
-            
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(summary)}`;
             document.getElementById('whatsapp-share-btn').setAttribute('href', whatsappUrl);
-            
             document.getElementById('share-sheet-modal').classList.remove('hidden');
         }
 
@@ -1505,7 +1575,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             const txns = getCurrentTransactions();
             const now = new Date();
             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            
             const expenses = txns.filter(t => t.amount < 0 && t.date.startsWith(currentMonthStr));
             
             if (expenses.length < 3) {
@@ -1515,11 +1584,9 @@ User Context Data: ${JSON.stringify(summaryData)}`;
 
             const totalSpent = expenses.reduce((a, b) => a + Math.abs(b.amount), 0);
             const topExpense = expenses.reduce((prev, current) => (Math.abs(prev.amount) > Math.abs(current.amount)) ? prev : current);
-            
             const catCounts = {};
             expenses.forEach(e => catCounts[e.category] = (catCounts[e.category] || 0) + Math.abs(e.amount));
             const topCat = Object.keys(catCounts).reduce((a, b) => catCounts[a] > catCounts[b] ? a : b);
-
             const sym = getCurrencySymbol();
 
             wrappedSlides = [
@@ -1529,20 +1596,17 @@ User Context Data: ${JSON.stringify(summaryData)}`;
                     <p class="text-lg opacity-90">Let's look at this month's damage...</p>
                     <p class="text-[10px] opacity-60 mt-12 uppercase tracking-widest font-bold">(Tap to continue)</p>
                 </div>`,
-                
                 `<div class="animate-slide-in flex flex-col h-full justify-center">
                     <p class="text-lg font-bold mb-4 opacity-90 uppercase tracking-widest">You spent a total of</p>
                     <h2 class="text-5xl font-extrabold text-yellow-300 mb-6 drop-shadow-md">${sym}${formatRupees(totalSpent)}</h2>
                     <p class="text-md opacity-90 font-medium">We hope it was worth it.</p>
                 </div>`,
-                
                 `<div class="animate-slide-in flex flex-col h-full justify-center">
                     <p class="text-lg font-bold mb-4 opacity-90 uppercase tracking-widest">Your biggest weakness was</p>
                     <div class="text-7xl mb-6 drop-shadow-lg p-6 bg-white/10 rounded-full w-32 h-32 mx-auto flex items-center justify-center backdrop-blur-sm">${getCategoryIcon(topCat)}</div>
                     <h2 class="text-3xl font-extrabold mb-3 drop-shadow-md">${topCat}</h2>
                     <p class="text-md opacity-90">Costing you ${sym}${formatRupees(catCounts[topCat])}.</p>
                 </div>`,
-                
                 `<div class="animate-slide-in flex flex-col h-full justify-center">
                     <p class="text-lg font-bold mb-6 opacity-90 uppercase tracking-widest">Your most expensive moment:</p>
                     <div class="bg-white/20 p-6 rounded-3xl backdrop-blur-sm border border-white/30">
@@ -1551,7 +1615,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
                     </div>
                     <p class="text-md opacity-80 mt-6 font-medium">Ouch.</p>
                 </div>`,
-                
                 `<div class="animate-slide-in flex flex-col h-full justify-center">
                     <i class="fa-solid fa-ranking-star text-6xl mb-6 text-yellow-300 drop-shadow-lg"></i>
                     <h2 class="text-4xl font-extrabold mb-4 drop-shadow-md">That's a wrap!</h2>
@@ -1568,12 +1631,7 @@ User Context Data: ${JSON.stringify(summaryData)}`;
         function renderWrappedSlide() {
             document.getElementById('wrapped-content').innerHTML = wrappedSlides[currentWrappedSlide];
             if (currentWrappedSlide === wrappedSlides.length - 1 && window.confetti) {
-                confetti({ 
-                    particleCount: 200, 
-                    spread: 90, 
-                    origin: { y: 0.6 },
-                    colors: ['#ffffff', '#fde047', '#f472b6', '#34d399']
-                });
+                confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ['#ffffff', '#fde047', '#f472b6', '#34d399'] });
             }
         }
 
@@ -1598,7 +1656,7 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             hideAddBudgetForm();
         }
 
-        function showAddBudgetForm() {
+        function showAddBudgetForm(editId = null) {
             document.getElementById('add-budget-form-container').classList.remove('hidden');
             document.getElementById('budgets-list-container').classList.add('hidden');
             
@@ -1614,6 +1672,21 @@ User Context Data: ${JSON.stringify(summaryData)}`;
                 opt.innerText = cat;
                 select.appendChild(opt);
             });
+
+            const submitBtn = document.getElementById('budget-submit-btn');
+            if (editId) {
+                const budget = appData.budgets.find(b => b.id === editId);
+                if (budget) {
+                    document.getElementById('edit-budget-id').value = budget.id;
+                    select.value = budget.category;
+                    document.getElementById('budget-limit').value = budget.limit;
+                    submitBtn.innerText = "Update Budget";
+                }
+            } else {
+                document.getElementById('edit-budget-id').value = '';
+                document.getElementById('new-budget-form').reset();
+                submitBtn.innerText = "Save Budget";
+            }
         }
 
         function hideAddBudgetForm() {
@@ -1624,26 +1697,37 @@ User Context Data: ${JSON.stringify(summaryData)}`;
 
         function saveNewBudget(e) {
             e.preventDefault();
+            const editId = document.getElementById('edit-budget-id').value;
             const category = document.getElementById('budget-category').value;
             const limit = parseFloat(document.getElementById('budget-limit').value);
             
             if(!category || isNaN(limit) || limit <= 0) return;
             
-            const existingIndex = appData.budgets.findIndex(b => b.accountId === appData.currentAccountId && b.category === category);
-            if(existingIndex >= 0) {
-                appData.budgets[existingIndex].limit = limit;
+            if (editId) {
+                const budget = appData.budgets.find(b => b.id == editId);
+                if (budget) {
+                    budget.category = category;
+                    budget.limit = limit;
+                }
+                showToast("Budget updated successfully!", 'success');
             } else {
-                appData.budgets.push({ 
-                    id: Date.now(), 
-                    accountId: appData.currentAccountId, 
-                    category, limit 
-                });
+                const existingIndex = appData.budgets.findIndex(b => b.accountId === appData.currentAccountId && b.category === category);
+                if(existingIndex >= 0) {
+                    appData.budgets[existingIndex].limit = limit;
+                    showToast(`Budget for ${category} updated`, 'success');
+                } else {
+                    appData.budgets.push({ 
+                        id: Date.now(), 
+                        accountId: appData.currentAccountId, 
+                        category, limit 
+                    });
+                    showToast(`Budget set for ${category}`, 'success');
+                }
             }
             
             updateLocalStorage();
             hideAddBudgetForm();
             renderBudgets();
-            showToast(`Budget set for ${category}`, 'success');
         }
 
         function renderBudgets() {
@@ -1659,7 +1743,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
 
             const now = new Date();
             const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            
             const currentTxns = getCurrentTransactions().filter(t => t.date.startsWith(currentMonthStr) && t.amount < 0);
 
             accountBudgets.forEach(budget => {
@@ -1684,7 +1767,10 @@ User Context Data: ${JSON.stringify(summaryData)}`;
                                 <p class="text-[10px] text-slate-500 font-semibold">${sym}${formatRupees(spent)} / ${sym}${formatRupees(budget.limit)} spent</p>
                             </div>
                         </div>
-                        <button onclick="deleteBudget(${budget.id})" class="text-[10px] text-rose-500 hover:underline">Remove</button>
+                        <div class="flex gap-2">
+                            <button onclick="showAddBudgetForm(${budget.id})" class="text-[10px] text-brand-600 dark:text-brand-400 font-semibold hover:underline">Edit</button>
+                            <button onclick="deleteBudget(${budget.id})" class="text-[10px] text-rose-500 hover:underline">Remove</button>
+                        </div>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
                         <div class="${barColor} h-1.5 rounded-full transition-all duration-700" style="width: ${percent}%"></div>
@@ -1750,7 +1836,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             const symbol = document.getElementById('custom-curr-sym').value.trim();
 
             if (!code || !symbol) return;
-
             if (!appData.customCurrencies) appData.customCurrencies = [];
 
             if (defaultCurrencies.some(c => c.code === code) || appData.customCurrencies.some(c => c.code === code)) {
@@ -1808,7 +1893,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
 
         function deleteCustomCategory(index) {
             const catName = appData.customCategories[index].name;
-            
             showConfirmModal(
                 "Delete Category",
                 `Are you sure you want to delete the category "${catName}"?`,
@@ -1826,7 +1910,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
         function saveCustomCategory(e) {
             e.preventDefault();
             const name = document.getElementById('new-cat-name').value.trim();
-
             if(!name) return;
 
             if(appData.customCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
@@ -1837,10 +1920,8 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             appData.customCategories.push({ name, type: 'debit' });
             updateLocalStorage();
             renderCategoryOptions();
-            
             document.getElementById('new-cat-name').value = ''; 
             renderCustomCategoriesList(); 
-            
             showToast(`Category "${name}" created!`, 'success');
         }
 
@@ -1854,9 +1935,24 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             hideAddGoalForm();
         }
 
-        function showAddGoalForm() {
+        function showAddGoalForm(editId = null) {
             document.getElementById('add-goal-form-container').classList.remove('hidden');
             document.getElementById('goals-list-container').classList.add('hidden');
+            
+            const submitBtn = document.getElementById('goal-submit-btn');
+            if (editId) {
+                const goal = appData.goals.find(g => g.id === editId);
+                if (goal) {
+                    document.getElementById('edit-goal-id').value = goal.id;
+                    document.getElementById('goal-name').value = goal.name;
+                    document.getElementById('goal-target').value = goal.target;
+                    submitBtn.innerText = "Update Goal";
+                }
+            } else {
+                document.getElementById('edit-goal-id').value = '';
+                document.getElementById('new-goal-form').reset();
+                submitBtn.innerText = "Start Saving";
+            }
         }
 
         function hideAddGoalForm() {
@@ -1867,16 +1963,27 @@ User Context Data: ${JSON.stringify(summaryData)}`;
 
         function saveNewGoal(e) {
             e.preventDefault();
+            const editId = document.getElementById('edit-goal-id').value;
             const name = document.getElementById('goal-name').value.trim();
             const target = parseFloat(document.getElementById('goal-target').value);
             
             if(!name || isNaN(target) || target <= 0) return;
             
-            appData.goals.push({ 
-                id: Date.now(), 
-                accountId: appData.currentAccountId, 
-                name, target, saved: 0
-            });
+            if (editId) {
+                const goal = appData.goals.find(g => g.id == editId);
+                if (goal) {
+                    goal.name = name;
+                    goal.target = target;
+                }
+                showToast("Goal updated successfully!", 'success');
+            } else {
+                appData.goals.push({ 
+                    id: Date.now(), 
+                    accountId: appData.currentAccountId, 
+                    name, target, saved: 0
+                });
+                showToast("Savings goal created!", 'success');
+            }
             
             updateLocalStorage();
             hideAddGoalForm();
@@ -1914,15 +2021,18 @@ User Context Data: ${JSON.stringify(summaryData)}`;
                                 <p class="text-[10px] text-slate-500 font-semibold">${sym}${formatRupees(goal.saved)} / ${sym}${formatRupees(goal.target)}</p>
                             </div>
                         </div>
-                        ${percent < 100 ? 
-                            `<button onclick="openAddFundsModal(${goal.id}, '${goal.name}')" class="w-8 h-8 bg-brand-100 hover:bg-brand-200 text-brand-600 dark:bg-brand-900/50 dark:hover:bg-brand-800 dark:text-brand-300 rounded-full flex justify-center items-center transition-all"><i class="fa-solid fa-plus text-xs"></i></button>` 
-                            : `<div class="text-emerald-500 text-sm font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Done</div>`
-                        }
+                        <div class="flex items-center gap-2">
+                            ${percent < 100 ? 
+                                `<button onclick="openAddFundsModal(${goal.id}, '${goal.name}')" class="w-8 h-8 bg-brand-100 hover:bg-brand-200 text-brand-600 dark:bg-brand-900/50 dark:hover:bg-brand-800 dark:text-brand-300 rounded-full flex justify-center items-center transition-all"><i class="fa-solid fa-plus text-xs"></i></button>` 
+                                : `<div class="text-emerald-500 text-sm font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Done</div>`
+                            }
+                            <button onclick="showAddGoalForm(${goal.id})" class="text-[10px] text-brand-600 dark:text-brand-400 font-semibold hover:underline">Edit</button>
+                            <button onclick="deleteGoal(${goal.id})" class="text-[10px] text-rose-500 hover:underline">Remove</button>
+                        </div>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
                         <div class="bg-brand-500 h-1.5 rounded-full transition-all duration-700" style="width: ${percent}%"></div>
                     </div>
-                    ${percent >= 100 ? `<button onclick="deleteGoal(${goal.id})" class="absolute top-2 right-2 text-[10px] text-rose-500 hover:underline">Remove</button>` : ''}
                 `;
                 list.appendChild(item);
             });
@@ -1951,7 +2061,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
                 updateLocalStorage();
                 closeAddFundsModal();
                 renderGoals();
-                
                 showToast(`Added ${getCurrencySymbol()}${formatRupees(amount)} to ${goal.name}!`, 'success');
             }
         }
@@ -1995,7 +2104,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             updateCurrencyUI();
 
             let currentTxns = getCurrentTransactions();
-
             const searchQ = document.getElementById('search-history')?.value.toLowerCase();
             const filterDate = document.getElementById('filter-date')?.value;
 
@@ -2043,7 +2151,6 @@ User Context Data: ${JSON.stringify(summaryData)}`;
             }
             init();
         });
-
     </script>
 </body>
 </html>
